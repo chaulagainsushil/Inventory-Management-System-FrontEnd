@@ -1,5 +1,5 @@
 "use client";
-import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartTooltipContent, ChartContainer, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 
@@ -46,8 +46,8 @@ export default function StockReportChart() {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="stockIn" fill={chartConfig.stockIn.color} radius={4} />
-            <Bar dataKey="stockOut" fill={chartConfig.stockOut.color} radius={4} />
+            <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={4} />
+            <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
