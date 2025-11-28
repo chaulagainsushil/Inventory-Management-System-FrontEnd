@@ -49,10 +49,18 @@ export default function CategoryList() {
 
   const apiBaseUrl = 'https://localhost:7232/api/Category';
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+  };
+
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(apiBaseUrl);
+      const response = await fetch(apiBaseUrl, { headers: getAuthHeaders() });
       if (!response.ok) throw new Error('Failed to fetch categories');
       const data = await response.json();
       setCategories(data);
@@ -60,7 +68,7 @@ export default function CategoryList() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not fetch categories.',
+        description: 'Could not fetch categories. Is your token valid?',
       });
     } finally {
       setLoading(false);
@@ -94,7 +102,7 @@ export default function CategoryList() {
     try {
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(selectedCategory ? { ...values, id: selectedCategory.id } : values),
       });
 
@@ -127,6 +135,7 @@ export default function CategoryList() {
     try {
       const response = await fetch(`${apiBaseUrl}/${selectedCategory.id}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
       if (!response.ok) throw new Error('Failed to delete category');
 

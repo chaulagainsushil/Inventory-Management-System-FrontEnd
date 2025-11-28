@@ -35,13 +35,21 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        // Assuming the API returns a token or session info which you might want to store
-        // For now, just redirecting on success
-        toast({
-          title: 'Login Successful',
-          description: 'Redirecting to your dashboard...',
-        });
-        router.push('/dashboard');
+        const data = await response.json();
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+          toast({
+            title: 'Login Successful',
+            description: 'Redirecting to your dashboard...',
+          });
+          router.push('/dashboard');
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'Authentication token was not provided.',
+          });
+        }
       } else {
         const errorData = await response.json();
         toast({
