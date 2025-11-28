@@ -38,6 +38,8 @@ import { useToast } from '@/hooks/use-toast';
 import { type Category } from '@/lib/types';
 import CategoryForm from './category-form';
 
+const apiBaseUrl = 'https://localhost:7232/api/Category';
+
 export default function CategoryList() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,8 +48,6 @@ export default function CategoryList() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const { toast } = useToast();
-
-  const apiBaseUrl = 'https://localhost:7232/api/Category';
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');
@@ -96,23 +96,26 @@ export default function CategoryList() {
 
   const handleFormSubmit = async (values: { name: string; description: string }) => {
     setFormLoading(true);
-    const method = selectedCategory ? 'PUT' : 'POST';
-    const url = selectedCategory ? `${apiBaseUrl}/${selectedCategory.id}` : apiBaseUrl;
+    const isEditing = !!selectedCategory;
+    const method = isEditing ? 'PUT' : 'POST';
+    const url = isEditing ? `${apiBaseUrl}/${selectedCategory.id}` : apiBaseUrl;
+    
+    const body = JSON.stringify(isEditing ? { id: selectedCategory.id, ...values } : values);
 
     try {
       const response = await fetch(url, {
         method,
         headers: getAuthHeaders(),
-        body: JSON.stringify(selectedCategory ? { ...values, id: selectedCategory.id } : values),
+        body,
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${selectedCategory ? 'update' : 'create'} category`);
+        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} category`);
       }
       
       toast({
         title: 'Success',
-        description: `Category successfully ${selectedCategory ? 'updated' : 'created'}.`,
+        description: `Category successfully ${isEditing ? 'updated' : 'created'}.`,
       });
 
       setIsFormOpen(false);
@@ -121,7 +124,7 @@ export default function CategoryList() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: `Could not ${selectedCategory ? 'update' : 'create'} category.`,
+        description: `Could not ${isEditing ? 'update' : 'create'} category.`,
       });
     } finally {
       setFormLoading(false);
