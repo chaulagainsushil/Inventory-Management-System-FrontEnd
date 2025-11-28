@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-illustration",
+      "description": "Abstract vector art for login page background",
+      "imageUrl": "https://images.unsplash.com/photo-1513909894411-7d7e04c28ecd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGlsbHVzdHJhdGlvbnxlbnwwfHx8fDE3NjQyOTg0NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract illustration"
+    },
+    {
+      "id": "p1",
+      "description": "Premium Wireless Headphones",
+      "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoZWFkcGhvbmVzfGVufDB8fHx8MTc2NDI2MzgzOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "headphones"
+    },
+    {
+      "id": "p2",
+      "description": "Ergonomic Office Chair",
+      "imageUrl": "https://images.unsplash.com/photo-1612372606404-0ab33e7187ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxvZmZpY2UlMjBjaGFpcnxlbnwwfHx8fDE3NjQyMzc5Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office chair"
+    },
+    {
+      "id": "p3",
+      "description": "Organic Green Tea",
+      "imageUrl": "https://images.unsplash.com/photo-1728034261748-f03195cf54ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0ZWElMjBib3h8ZW58MHx8fHwxNzY0Mjk4NDQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tea box"
+    },
+    {
+      "id": "p4",
+      "description": "Smart Fitness Tracker",
+      "imageUrl": "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzbWFydCUyMHdhdGNofGVufDB8fHx8MTc2NDIyMzYxMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart watch"
+    },
+    {
+      "id": "p5",
+      "description": "Hardcover Notebook Set",
+      "imageUrl": "https://images.unsplash.com/photo-1612367980327-7454a7276aa7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxub3RlYm9va3N8ZW58MHx8fHwxNzY0MTk0NTI1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "notebooks"
+    }
+  ]
 }
