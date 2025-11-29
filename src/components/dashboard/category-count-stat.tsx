@@ -5,17 +5,17 @@ import { LayoutGrid } from 'lucide-react';
 import StatCard from '@/components/dashboard/stat-card';
 
 export default function CategoryCountStat() {
-  const [count, setCount] = useState('0');
+  const [count, setCount] = useState('...');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCategoryCount = async () => {
-      setLoading(true);
+    const fetchWithToken = async () => {
       try {
         const token = localStorage.getItem('authToken');
         if (!token) {
-          // Don't throw an error, just wait. The token might not be ready yet.
-          setCount('N/A');
+          // If token is not found, wait and retry.
+          // This can happen on initial load or if login state is still being set.
+          setTimeout(fetchWithToken, 500);
           return;
         }
 
@@ -26,6 +26,8 @@ export default function CategoryCountStat() {
         });
 
         if (!response.ok) {
+          // If response is not ok, it might be a temporary server issue or invalid token.
+          // We set to N/A to indicate a problem.
           throw new Error('Failed to fetch category count.');
         }
 
@@ -33,18 +35,14 @@ export default function CategoryCountStat() {
         setCount(data.toString());
       } catch (error: any) {
         console.error('Failed to fetch category count:', error);
-        setCount('N/A');
+        setCount('N/A'); // Set to 'N/A' on error to indicate a problem.
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategoryCount();
+    fetchWithToken();
   }, []);
-
-  if (loading) {
-    return <StatCard title="Total Categories" value="..." icon={LayoutGrid} />;
-  }
 
   return <StatCard title="Total Categories" value={count} icon={LayoutGrid} />;
 }
