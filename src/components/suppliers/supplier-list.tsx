@@ -60,6 +60,11 @@ export default function SupplierList() {
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');
+    if (!token) {
+      // Return null or handle the absence of a token as needed.
+      // This helps in scenarios where you might want to prevent the API call.
+      return null;
+    }
     return {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -68,8 +73,21 @@ export default function SupplierList() {
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true);
+    const headers = getAuthHeaders();
+    if (!headers) {
+      // Don't try to fetch if we don't have a token.
+      // The effect below will retry when the token becomes available.
+       toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'Auth token not found. Please log in again.',
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch(apiBaseUrl, { headers: getAuthHeaders() });
+      const response = await fetch(apiBaseUrl, { headers });
       if (!response.ok) throw new Error('Failed to fetch suppliers');
       const data = await response.json();
       setSuppliers(data);
@@ -105,6 +123,13 @@ export default function SupplierList() {
 
   const handleFormSubmit = async (values: z.infer<typeof supplierFormSchema>) => {
     setFormLoading(true);
+    const headers = getAuthHeaders();
+    if (!headers) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
+        setFormLoading(false);
+        return;
+    }
+
     const isEditing = !!selectedSupplier;
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/${selectedSupplier.id}` : apiBaseUrl;
@@ -114,7 +139,7 @@ export default function SupplierList() {
     try {
       const response = await fetch(url, {
         method,
-        headers: getAuthHeaders(),
+        headers,
         body,
       });
 
@@ -144,10 +169,17 @@ export default function SupplierList() {
     if (!selectedSupplier) return;
     setFormLoading(true);
 
+    const headers = getAuthHeaders();
+    if (!headers) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
+        setFormLoading(false);
+        return;
+    }
+
     try {
       const response = await fetch(`${apiBaseUrl}/${selectedSupplier.id}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
+        headers,
       });
       if (!response.ok) throw new Error('Failed to delete supplier');
 
