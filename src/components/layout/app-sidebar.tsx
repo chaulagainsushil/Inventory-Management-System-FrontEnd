@@ -26,7 +26,7 @@ const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '#', icon: Boxes, label: 'Products' },
   { href: '/categories', icon: LayoutGrid, label: 'Categories' },
-  { href: '#', icon: Truck, label: 'Suppliers' },
+  { href: '/suppliers', icon: Truck, label: 'Suppliers' },
   { href: '#', icon: FileStack, label: 'Purchase Orders' },
   { href: '#', icon: ArrowRightLeft, label: 'Sales / Issue Goods' },
   { href: '#', icon: BarChartIcon, label: 'Reports' },
