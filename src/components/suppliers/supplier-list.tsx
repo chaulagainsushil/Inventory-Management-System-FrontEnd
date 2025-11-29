@@ -37,8 +37,17 @@ import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type Supplier } from '@/lib/types';
 import SupplierForm from './supplier-form';
+import { z } from 'zod';
 
-const apiBaseUrl = 'https://localhost:7232/api/Supplier';
+const apiBaseUrl = 'https://localhost:7232/api/SupplierInformation';
+
+const supplierFormSchema = z.object({
+  name: z.string().min(2),
+  contactPerson: z.string().min(2),
+  phoneNumber: z.string().min(10),
+  email: z.string().email(),
+  address: z.string().min(5),
+});
 
 export default function SupplierList() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -94,7 +103,7 @@ export default function SupplierList() {
     setIsDeleteAlertOpen(true);
   };
 
-  const handleFormSubmit = async (values: { name: string; description: string }) => {
+  const handleFormSubmit = async (values: z.infer<typeof supplierFormSchema>) => {
     setFormLoading(true);
     const isEditing = !!selectedSupplier;
     const method = isEditing ? 'PUT' : 'POST';
@@ -183,18 +192,22 @@ export default function SupplierList() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">ID</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead>Contact Person</TableHead>
+                  <TableHead className="hidden md:table-cell">Phone</TableHead>
+                  <TableHead className="hidden md:table-cell">Email</TableHead>
+                  <TableHead className="hidden lg:table-cell">Address</TableHead>
                   <TableHead className="w-[100px] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {suppliers.map((supplier) => (
                   <TableRow key={supplier.id}>
-                    <TableCell>{supplier.id}</TableCell>
                     <TableCell className="font-medium">{supplier.name}</TableCell>
-                    <TableCell>{supplier.description}</TableCell>
+                    <TableCell>{supplier.contactPerson}</TableCell>
+                    <TableCell className="hidden md:table-cell">{supplier.phoneNumber}</TableCell>
+                    <TableCell className="hidden md:table-cell">{supplier.email}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{supplier.address}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

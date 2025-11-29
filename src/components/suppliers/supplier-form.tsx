@@ -30,8 +30,17 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: 'Supplier name must be at least 2 characters.',
   }),
-  description: z.string().min(5, {
-    message: 'Description must be at least 5 characters.',
+  contactPerson: z.string().min(2, {
+    message: 'Contact person must be at least 2 characters.',
+  }),
+  phoneNumber: z.string().min(10, {
+    message: 'Phone number must be at least 10 digits.',
+  }),
+  email: z.string().email({
+    message: 'Please enter a valid email address.',
+  }),
+  address: z.string().min(5, {
+    message: 'Address must be at least 5 characters.',
   }),
 });
 
@@ -54,25 +63,31 @@ export default function SupplierForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: supplier?.name || '',
-      description: supplier?.description || '',
+      contactPerson: supplier?.contactPerson || '',
+      phoneNumber: supplier?.phoneNumber || '',
+      email: supplier?.email || '',
+      address: supplier?.address || '',
     },
   });
 
   React.useEffect(() => {
     form.reset({
       name: supplier?.name || '',
-      description: supplier?.description || '',
+      contactPerson: supplier?.contactPerson || '',
+      phoneNumber: supplier?.phoneNumber || '',
+      email: supplier?.email || '',
+      address: supplier?.address || '',
     });
   }, [supplier, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{supplier ? 'Edit Supplier' : 'Add Supplier'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -86,15 +101,54 @@ export default function SupplierForm({
                 </FormItem>
               )}
             />
-            <FormField
+             <FormField
               control={form.control}
-              name="description"
+              name="contactPerson"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Contact Person</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Jane Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., (555) 123-4567" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., contact@globaltech.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="A brief description of the supplier."
+                      placeholder="e.g., 123 Innovation Drive, Tech City, 12345"
                       {...field}
                     />
                   </FormControl>

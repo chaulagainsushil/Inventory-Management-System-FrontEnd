@@ -7,5 +7,8 @@ export type Category = {
 export type Supplier = {
   id: number;
   name: string;
-  description: string;
+  contactPerson: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
 };
