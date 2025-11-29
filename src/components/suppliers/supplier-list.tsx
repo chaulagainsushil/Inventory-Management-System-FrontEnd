@@ -61,8 +61,6 @@ export default function SupplierList() {
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      // Return null or handle the absence of a token as needed.
-      // This helps in scenarios where you might want to prevent the API call.
       return null;
     }
     return {
@@ -72,20 +70,14 @@ export default function SupplierList() {
   };
 
   const fetchSuppliers = useCallback(async () => {
-    setLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-      // Don't try to fetch if we don't have a token.
-      // The effect below will retry when the token becomes available.
-       toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'Auth token not found. Please log in again.',
-      });
-      setLoading(false);
-      return;
+       // If token is not found, wait and retry.
+       setTimeout(fetchSuppliers, 500);
+       return;
     }
 
+    setLoading(true);
     try {
       const response = await fetch(apiBaseUrl, { headers });
       if (!response.ok) throw new Error('Failed to fetch suppliers');
@@ -216,7 +208,7 @@ export default function SupplierList() {
           <CardDescription>A list of all your business suppliers.</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading && suppliers.length === 0 ? (
             <div className="flex justify-center items-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
