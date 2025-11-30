@@ -159,7 +159,7 @@ export default function SupplierList() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: `Could not ${isEditing ? 'update' : 'create'} supplier.`,
+        description: `Could not ${isEditing ? 'update' : 'create'} supplier. ${error.message}`,
       });
     } finally {
       setFormLoading(false);
