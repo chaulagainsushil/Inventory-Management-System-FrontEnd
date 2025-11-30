@@ -101,12 +101,7 @@ export default function SupplierList() {
   }, [toast]);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      fetchSuppliers();
-    } else {
-      setLoading(false);
-    }
+    fetchSuppliers();
   }, [fetchSuppliers]);
 
   const handleAddClick = () => {
