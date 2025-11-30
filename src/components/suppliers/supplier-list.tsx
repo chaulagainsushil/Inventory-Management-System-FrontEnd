@@ -137,7 +137,7 @@ export default function SupplierList() {
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/${selectedSupplier.id}` : apiBaseUrl;
     
-    const body = JSON.stringify(isEditing ? { id: selectedSupplier.id, ...values } : values);
+    const body = JSON.stringify(values);
 
     try {
       const response = await fetch(url, {
