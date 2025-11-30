@@ -58,7 +58,8 @@ export default function SupplierList() {
   const [formLoading, setFormLoading] = useState(false);
   const { toast } = useToast();
 
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
+    if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('authToken');
     if (!token) {
       return null;
@@ -67,13 +68,12 @@ export default function SupplierList() {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     };
-  };
+  }, []);
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-      // Don't toast here, just wait for token
       setLoading(false);
       return;
     }
@@ -89,27 +89,17 @@ export default function SupplierList() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not fetch suppliers. Is your API server running?',
+        description: 'Could not fetch suppliers. Is your API server running and are you logged in?',
       });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, getAuthHeaders]);
 
   useEffect(() => {
-    const checkTokenAndFetch = () => {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          fetchSuppliers();
-        } else {
-          // If no token, wait and retry. This handles cases where this component
-          // loads before the token is set (e.g., on initial login).
-          setTimeout(checkTokenAndFetch, 500);
-        }
-      }
-    };
-    checkTokenAndFetch();
+    // This effect ensures we only fetch data on the client-side
+    // after the component has mounted.
+    fetchSuppliers();
   }, [fetchSuppliers]);
 
   const handleAddClick = () => {
@@ -131,7 +121,7 @@ export default function SupplierList() {
     setFormLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to perform this action.' });
         setFormLoading(false);
         return;
     }
@@ -151,7 +141,7 @@ export default function SupplierList() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} supplier. Server responded with: ${errorData}`);
+        throw new Error(`Server error: ${errorData}`);
       }
       
       toast({
@@ -164,8 +154,8 @@ export default function SupplierList() {
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: error.message || `Could not ${isEditing ? 'update' : 'create'} supplier.`,
+        title: 'Operation Failed',
+        description: `Could not ${isEditing ? 'update' : 'create'} supplier. ${error.message}`,
       });
     } finally {
       setFormLoading(false);
@@ -178,7 +168,7 @@ export default function SupplierList() {
 
     const headers = getAuthHeaders();
     if (!headers) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to perform this action.' });
         setFormLoading(false);
         return;
     }
