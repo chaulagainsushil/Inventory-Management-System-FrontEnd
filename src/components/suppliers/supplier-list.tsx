@@ -70,19 +70,23 @@ export default function SupplierList() {
     };
   }, []);
 
-  const fetchSuppliers = useCallback(async () => {
-    setLoading(true);
+  const fetchSuppliers = useCallback(async (retries = 3) => {
     const headers = getAuthHeaders();
     if (!headers) {
+      if (retries > 0) {
+        setTimeout(() => fetchSuppliers(retries - 1), 500);
+      } else {
         toast({
             variant: 'destructive',
             title: 'Authentication Error',
             description: 'Could not find auth token. Please log in again.',
         });
-      setLoading(false);
+        setLoading(false);
+      }
       return;
     }
     
+    setLoading(true);
     try {
       const response = await fetch(apiBaseUrl, { headers });
       if (!response.ok) {
@@ -144,7 +148,7 @@ export default function SupplierList() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Server error: ${errorData}`);
+        throw new Error(`Server error: ${errorData || 'Failed to process request'}`);
       }
       
       toast({
