@@ -1,21 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LayoutGrid } from 'lucide-react';
 import StatCard from '@/components/dashboard/stat-card';
 
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 1000;
+
 export default function CategoryCountStat() {
   const [count, setCount] = useState('...');
-  const [loading, setLoading] = useState(true);
+  const retries = useRef(0);
 
   useEffect(() => {
     const fetchWithToken = async () => {
       try {
         const token = localStorage.getItem('authToken');
+
         if (!token) {
-          // If token is not found, wait and retry.
-          // This can happen on initial load or if login state is still being set.
-          setTimeout(fetchWithToken, 500);
+          if (retries.current < MAX_RETRIES) {
+            retries.current += 1;
+            setTimeout(fetchWithToken, RETRY_DELAY);
+          } else {
+            throw new Error('Auth token not found after multiple retries.');
+          }
           return;
         }
 
@@ -26,18 +33,14 @@ export default function CategoryCountStat() {
         });
 
         if (!response.ok) {
-          // If response is not ok, it might be a temporary server issue or invalid token.
-          // We set to N/A to indicate a problem.
           throw new Error('Failed to fetch category count.');
         }
 
         const data = await response.json();
         setCount(data.toString());
       } catch (error: any) {
-        console.error('Failed to fetch category count:', error);
-        setCount('N/A'); // Set to 'N/A' on error to indicate a problem.
-      } finally {
-        setLoading(false);
+        console.error('Failed to fetch category count:', error.message);
+        setCount('N/A');
       }
     };
 
