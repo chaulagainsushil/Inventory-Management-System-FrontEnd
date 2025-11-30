@@ -228,6 +228,7 @@ export default function SupplierList() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[100px]">ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Contact Person</TableHead>
                   <TableHead className="hidden md:table-cell">Phone</TableHead>
@@ -239,6 +240,7 @@ export default function SupplierList() {
               <TableBody>
                 {suppliers.length > 0 ? suppliers.map((supplier) => (
                   <TableRow key={supplier.id}>
+                    <TableCell>{supplier.id}</TableCell>
                     <TableCell className="font-medium">{supplier.name}</TableCell>
                     <TableCell>{supplier.contactPerson}</TableCell>
                     <TableCell className="hidden md:table-cell">{supplier.phoneNumber}</TableCell>
@@ -265,7 +267,7 @@ export default function SupplierList() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center h-24">
+                    <TableCell colSpan={7} className="text-center h-24">
                       No suppliers found.
                     </TableCell>
                   </TableRow>
