@@ -10,22 +10,21 @@ export default function CategoryCountStat() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // This effect runs once after the component mounts on the client.
-    const token = localStorage.getItem('authToken');
+    const fetchWithToken = async (retries = 3) => {
+      const token = localStorage.getItem('authToken');
 
-    if (!token) {
-      // If there's no token, don't even try to fetch.
-      // This might happen if the user is not logged in.
-      // We'll wait for a short period in case the token is being set.
-      const handle = setTimeout(() => {
-        if (!localStorage.getItem('authToken')) {
-            setCount('N/A');
+      if (!token) {
+        if (retries > 0) {
+          // If token not found, wait a bit and retry.
+          setTimeout(() => fetchWithToken(retries - 1), 500);
+        } else {
+          setCount('N/A');
+          const errorMessage = "Auth token not found after multiple retries.";
+          console.error('Failed to fetch category count:', errorMessage);
         }
-      }, 1500);
-      return () => clearTimeout(handle);
-    }
+        return;
+      }
 
-    const fetchCategoryCount = async () => {
       try {
         const response = await fetch('https://localhost:7232/api/Category/count', {
           headers: {
@@ -46,12 +45,12 @@ export default function CategoryCountStat() {
         toast({
           variant: 'destructive',
           title: 'API Error',
-          description: 'Could not fetch category count from the server.',
+          description: error.message || 'Could not fetch category count from the server.',
         });
       }
     };
-
-    fetchCategoryCount();
+    
+    fetchWithToken();
   }, [toast]);
 
   return <StatCard title="Total Categories" value={count} icon={LayoutGrid} />;
