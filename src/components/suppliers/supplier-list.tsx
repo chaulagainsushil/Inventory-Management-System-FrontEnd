@@ -73,11 +73,7 @@ export default function SupplierList() {
     setLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'Auth token not found. Please log in again.',
-      });
+      // Don't toast here, just wait for token
       setLoading(false);
       return;
     }
@@ -101,10 +97,19 @@ export default function SupplierList() {
   }, [toast]);
 
   useEffect(() => {
-    // Wait for the browser to be ready before fetching
-    if (typeof window !== 'undefined') {
-      fetchSuppliers();
-    }
+    const checkTokenAndFetch = () => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          fetchSuppliers();
+        } else {
+          // If no token, wait and retry. This handles cases where this component
+          // loads before the token is set (e.g., on initial login).
+          setTimeout(checkTokenAndFetch, 500);
+        }
+      }
+    };
+    checkTokenAndFetch();
   }, [fetchSuppliers]);
 
   const handleAddClick = () => {
@@ -145,7 +150,8 @@ export default function SupplierList() {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} supplier`);
+        const errorData = await response.text();
+        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} supplier. Server responded with: ${errorData}`);
       }
       
       toast({
@@ -159,7 +165,7 @@ export default function SupplierList() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: `Could not ${isEditing ? 'update' : 'create'} supplier. ${error.message}`,
+        description: error.message || `Could not ${isEditing ? 'update' : 'create'} supplier.`,
       });
     } finally {
       setFormLoading(false);
