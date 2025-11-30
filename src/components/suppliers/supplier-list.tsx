@@ -70,24 +70,30 @@ export default function SupplierList() {
   };
 
   const fetchSuppliers = useCallback(async () => {
+    setLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-       // If token is not found, wait and retry.
-       setTimeout(fetchSuppliers, 500);
-       return;
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'Auth token not found. Please log in again.',
+      });
+      setLoading(false);
+      return;
     }
 
-    setLoading(true);
     try {
       const response = await fetch(apiBaseUrl, { headers });
-      if (!response.ok) throw new Error('Failed to fetch suppliers');
+      if (!response.ok) {
+        throw new Error('Failed to fetch suppliers');
+      }
       const data = await response.json();
       setSuppliers(data);
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not fetch suppliers. Is your token valid?',
+        description: 'Could not fetch suppliers. Is your API server running?',
       });
     } finally {
       setLoading(false);
@@ -95,7 +101,12 @@ export default function SupplierList() {
   }, [toast]);
 
   useEffect(() => {
-    fetchSuppliers();
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      fetchSuppliers();
+    } else {
+      setLoading(false);
+    }
   }, [fetchSuppliers]);
 
   const handleAddClick = () => {
@@ -208,7 +219,7 @@ export default function SupplierList() {
           <CardDescription>A list of all your business suppliers.</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading && suppliers.length === 0 ? (
+          {loading ? (
             <div className="flex justify-center items-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
@@ -225,7 +236,7 @@ export default function SupplierList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {suppliers.map((supplier) => (
+                {suppliers.length > 0 ? suppliers.map((supplier) => (
                   <TableRow key={supplier.id}>
                     <TableCell className="font-medium">{supplier.name}</TableCell>
                     <TableCell>{supplier.contactPerson}</TableCell>
@@ -251,7 +262,13 @@ export default function SupplierList() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center h-24">
+                      No suppliers found.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           )}
