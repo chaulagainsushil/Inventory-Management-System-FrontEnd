@@ -73,46 +73,38 @@ export default function SupplierList() {
     setLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-      // If there's no token, don't even try to fetch.
-      // This might happen if the user is not logged in.
-      // We'll wait for a short period in case the token is being set.
-      const handle = setTimeout(() => {
-        if (!localStorage.getItem('authToken')) {
-            setLoading(false);
-            toast({
-              variant: 'destructive',
-              title: 'Authentication Error',
-              description: 'Auth token not found. Please log in again.',
-            });
-        } else {
-            // Token found, retry fetch
-            fetchSuppliers();
-        }
-      }, 1500);
-      // Do not return here, let it fall through to finally
-    } else {
-        try {
-            const response = await fetch(apiBaseUrl, { headers });
-            if (!response.ok) {
-              throw new Error('Failed to fetch suppliers');
-            }
-            const data = await response.json();
-            setSuppliers(data);
-          } catch (error) {
-            toast({
-              variant: 'destructive',
-              title: 'Error',
-              description: 'Could not fetch suppliers. Is your API server running?',
-            });
-          }
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'Auth token not found. Please log in again.',
+      });
+      setLoading(false);
+      return;
     }
     
-    setLoading(false);
-
+    try {
+      const response = await fetch(apiBaseUrl, { headers });
+      if (!response.ok) {
+        throw new Error('Failed to fetch suppliers');
+      }
+      const data = await response.json();
+      setSuppliers(data);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not fetch suppliers. Is your API server running?',
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [toast]);
 
   useEffect(() => {
-    fetchSuppliers();
+    // Wait for the browser to be ready before fetching
+    if (typeof window !== 'undefined') {
+      fetchSuppliers();
+    }
   }, [fetchSuppliers]);
 
   const handleAddClick = () => {
@@ -163,7 +155,7 @@ export default function SupplierList() {
 
       setIsFormOpen(false);
       fetchSuppliers(); // Refresh list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
