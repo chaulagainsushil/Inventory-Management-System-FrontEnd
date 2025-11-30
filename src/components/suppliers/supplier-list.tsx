@@ -74,6 +74,11 @@ export default function SupplierList() {
     setLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
+        toast({
+            variant: 'destructive',
+            title: 'Authentication Error',
+            description: 'Could not find auth token. Please log in again.',
+        });
       setLoading(false);
       return;
     }
@@ -97,8 +102,6 @@ export default function SupplierList() {
   }, [toast, getAuthHeaders]);
 
   useEffect(() => {
-    // This effect ensures we only fetch data on the client-side
-    // after the component has mounted.
     fetchSuppliers();
   }, [fetchSuppliers]);
 
