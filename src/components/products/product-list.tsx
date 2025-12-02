@@ -27,12 +27,28 @@ import {
 import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type Product } from '@/lib/types';
+import ProductForm from './product-form';
+import { z } from 'zod';
 
 const apiBaseUrl = 'https://localhost:7232/api/Product';
+
+const productFormSchema = z.object({
+    productName: z.string().min(2, 'Product name is too short'),
+    description: z.string().min(5, 'Description is too short'),
+    pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
+    sku: z.string().min(1, 'SKU is required'),
+    quantityPerUnit: z.string().min(1, 'Quantity is required'),
+    reoredLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer'),
+    categoryId: z.coerce.number().int().min(1, 'Category ID is required'),
+    supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
+  });
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { toast } = useToast();
 
   const getAuthHeaders = useCallback(() => {
@@ -86,12 +102,62 @@ export default function ProductList() {
     fetchProducts();
   }, [fetchProducts]);
 
+  const handleAddClick = () => {
+    setSelectedProduct(null);
+    setIsFormOpen(true);
+  };
+
+  const handleFormSubmit = async (values: z.infer<typeof productFormSchema>) => {
+    setFormLoading(true);
+    const headers = getAuthHeaders();
+    if (!headers) {
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to perform this action.' });
+        setFormLoading(false);
+        return;
+    }
+
+    const isEditing = !!selectedProduct;
+    const method = isEditing ? 'PUT' : 'POST';
+    const url = isEditing ? `${apiBaseUrl}/${selectedProduct.id}` : apiBaseUrl;
+    
+    const body = JSON.stringify(values);
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        body,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Server error: ${errorData || 'Failed to process request'}`);
+      }
+      
+      toast({
+        title: 'Success',
+        description: `Product successfully ${isEditing ? 'updated' : 'created'}.`,
+      });
+
+      setIsFormOpen(false);
+      fetchProducts(); // Refresh list
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Operation Failed',
+        description: `Could not ${isEditing ? 'update' : 'create'} product. ${error.message}`,
+      });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
 
   return (
     <>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Product Management</h1>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90">
           <PlusCircle className="mr-2 h-4 w-4" /> Add Product
         </Button>
       </div>
@@ -161,6 +227,14 @@ export default function ProductList() {
           )}
         </CardContent>
       </Card>
+      
+      <ProductForm
+        isOpen={isFormOpen}
+        setIsOpen={setIsFormOpen}
+        onSubmit={handleFormSubmit}
+        product={selectedProduct}
+        loading={formLoading}
+      />
     </>
   );
 }
