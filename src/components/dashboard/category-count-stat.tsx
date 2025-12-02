@@ -22,7 +22,6 @@ export default function CategoryCountStat() {
           setTimeout(() => fetchCategoryCount(retries - 1), 500);
         } else {
           setCount('N/A');
-          // No console.error here to prevent error overlay
         }
         return;
       }
