@@ -10,6 +10,7 @@ import TargetPrediction from "@/components/dashboard/target-prediction";
 import SalesStatsChart from "@/components/dashboard/sales-stats-chart";
 import ProductList from "@/components/dashboard/product-list";
 import CategoryCountStat from "@/components/dashboard/category-count-stat";
+import ProductCountStat from "@/components/dashboard/product-count-stat";
 
 export const metadata: Metadata = {
   title: "Dashboard | StockSync",
@@ -25,7 +26,7 @@ export default function DashboardPage() {
           <Header />
           <main className="p-4 sm:p-6 lg:p-8 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard title="Total Products" value="1,250" icon={Boxes} />
+              <ProductCountStat />
               <CategoryCountStat />
               <StatCard title="Stock Alerts" value="5" icon={AlertTriangle} variant="destructive" />
               <StatCard title="Monthly Revenue" value="$45,231.89" icon={DollarSign} />
