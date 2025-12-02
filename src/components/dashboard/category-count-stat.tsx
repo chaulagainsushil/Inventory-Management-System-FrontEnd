@@ -10,14 +10,20 @@ export default function CategoryCountStat() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // This function will run only on the client side after the component mounts.
-    const fetchCategoryCount = async () => {
+    const fetchCategoryCount = async (retries = 3) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
       const token = localStorage.getItem('authToken');
 
       if (!token) {
-        setCount('N/A');
-        // Don't toast here as it might be an expected state before login.
-        console.error('Authentication token not found.');
+        if (retries > 0) {
+          setTimeout(() => fetchCategoryCount(retries - 1), 500);
+        } else {
+          setCount('N/A');
+          // No console.error here to prevent error overlay
+        }
         return;
       }
 
@@ -30,7 +36,6 @@ export default function CategoryCountStat() {
         });
 
         if (!response.ok) {
-          // The API returned an error (e.g., 401, 500)
           throw new Error(`Failed to fetch category count. Status: ${response.status}`);
         }
 
@@ -47,12 +52,8 @@ export default function CategoryCountStat() {
       }
     };
     
-    // A small delay to ensure the token from a fresh login is available.
-    const timer = setTimeout(() => {
-        fetchCategoryCount();
-    }, 100);
+    fetchCategoryCount();
 
-    return () => clearTimeout(timer);
   }, [toast]);
 
   return <StatCard title="Total Categories" value={count} icon={LayoutGrid} />;
