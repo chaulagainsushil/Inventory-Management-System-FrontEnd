@@ -10,12 +10,20 @@ export default function ProductCountStat() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchProductCount = async () => {
+    const fetchProductCount = async (retries = 3) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
       const token = localStorage.getItem('authToken');
 
       if (!token) {
-        setCount('N/A');
-        console.error('Authentication token not found.');
+        if (retries > 0) {
+          setTimeout(() => fetchProductCount(retries - 1), 500);
+        } else {
+          setCount('N/A');
+          console.error('Authentication token not found after multiple retries.');
+        }
         return;
       }
 
@@ -44,12 +52,8 @@ export default function ProductCountStat() {
       }
     };
     
-    // A small delay to ensure the token from a fresh login is available.
-    const timer = setTimeout(() => {
-        fetchProductCount();
-    }, 100);
+    fetchProductCount();
 
-    return () => clearTimeout(timer);
   }, [toast]);
 
   return <StatCard title="Total Products" value={count} icon={Boxes} />;
