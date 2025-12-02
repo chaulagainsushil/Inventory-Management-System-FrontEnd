@@ -30,7 +30,6 @@ export default function ProductCountStat() {
         const response = await fetch('https://localhost:7232/api/Product/count', {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
           },
         });
 
