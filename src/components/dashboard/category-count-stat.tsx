@@ -35,7 +35,7 @@ export default function CategoryCountStat() {
         }
 
         const data = await response.json();
-        setCount(data.toString());
+        setCount(data.totalCategories);
       } catch (error: any) {
         console.error('Error fetching category count:', error.message);
         setCount('N/A');

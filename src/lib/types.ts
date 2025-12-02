@@ -1,3 +1,4 @@
+
 export type Category = {
   id: number;
   name: string;
@@ -11,4 +12,16 @@ export type Supplier = {
   phoneNumber: string;
   email: string;
   address: string;
+};
+
+export type Product = {
+  id: number;
+  categoryId: number;
+  supplierId: number;
+  productName: string;
+  description: string;
+  pricePerUnit: number;
+  sku: string;
+  quantityPerUnit: string;
+  reoredLevel: number;
 };

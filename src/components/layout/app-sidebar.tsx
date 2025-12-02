@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Sidebar,
@@ -24,7 +25,7 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '#', icon: Boxes, label: 'Products' },
+  { href: '/products', icon: Boxes, label: 'Products' },
   { href: '/categories', icon: LayoutGrid, label: 'Categories' },
   { href: '/suppliers', icon: Truck, label: 'Suppliers' },
   { href: '#', icon: FileStack, label: 'Purchase Orders' },
