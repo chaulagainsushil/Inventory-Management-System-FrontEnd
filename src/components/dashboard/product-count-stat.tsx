@@ -22,13 +22,13 @@ export default function ProductCountStat() {
           setTimeout(() => fetchProductCount(retries - 1), 500);
         } else {
           setCount('N/A');
-          console.error('Authentication token not found after multiple retries.');
+          // No console.error here to prevent error overlay
         }
         return;
       }
 
       try {
-        const response = await fetch('https://localhost:7232/api/Product/Productcount', {
+        const response = await fetch('https://localhost:7232/api/Product/count', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
