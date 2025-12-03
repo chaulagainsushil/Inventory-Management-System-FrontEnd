@@ -44,7 +44,7 @@ export default function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="@admin" />
+                <AvatarImage src="https://images.unsplash.com/photo-1718037229583-0a4a5a549156?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=580&q=80" alt="@admin" />
                 <AvatarFallback>AD</AvatarFallback>
               </Avatar>
             </Button>

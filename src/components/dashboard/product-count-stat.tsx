@@ -41,7 +41,7 @@ export default function ProductCountStat() {
         }
 
         const data = await response.json();
-        setCount(data.totalProducts);
+        setCount(data.totalProductCount);
         setShouldRetry(false); 
       } catch (error: any) {
         setCount('N/A');
