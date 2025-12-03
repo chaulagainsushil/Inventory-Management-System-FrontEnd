@@ -5,13 +5,16 @@ import { Boxes } from 'lucide-react';
 import StatCard from '@/components/dashboard/stat-card';
 import { useToast } from '@/hooks/use-toast';
 
+const apiBaseUrl = 'https://localhost:7232/api/Product/Productcount';
+
 export default function ProductCountStat() {
   const [count, setCount] = useState('...');
+  const [shouldRetry, setShouldRetry] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchProductCount = async (retries = 3) => {
-      if (typeof window === 'undefined') {
+      if (typeof window === 'undefined' || !shouldRetry) {
         return;
       }
       
@@ -27,10 +30,9 @@ export default function ProductCountStat() {
       }
 
       try {
-        const response = await fetch('https://localhost:7232/api/Product/Productcount', {
+        const response = await fetch(apiBaseUrl, {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
           },
         });
 
@@ -40,29 +42,22 @@ export default function ProductCountStat() {
 
         const data = await response.json();
         setCount(data.totalProducts);
+        setShouldRetry(false); 
       } catch (error: any) {
-        console.error('Error fetching product count:', error.message);
         setCount('N/A');
-        
-        if (error instanceof TypeError && error.message === 'Failed to fetch') {
-          toast({
-            variant: 'destructive',
-            title: 'Network Error',
-            description: 'Could not connect to the API server. Please ensure your backend is running and that CORS is configured to allow requests from this origin.',
-          });
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'API Error',
-            description: error.message || 'Could not fetch product count from the server.',
-          });
-        }
+        setShouldRetry(false); // Stop retrying on network errors
+        toast({
+          variant: 'destructive',
+          title: 'API Connection Error',
+          description: 'Could not connect to the server. Please ensure the backend is running and CORS is configured correctly.',
+        });
+        console.error('Error fetching product count:', error.message);
       }
     };
     
     fetchProductCount();
 
-  }, [toast]);
+  }, [toast, shouldRetry]);
 
   return <StatCard title="Total Products" value={count} icon={Boxes} />;
 }
