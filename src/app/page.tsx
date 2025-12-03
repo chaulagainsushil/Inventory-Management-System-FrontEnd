@@ -9,12 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Smartphone, ShieldCheck, Warehouse } from 'lucide-react';
 
 export default function LoginPage() {
-  const loginImage = PlaceHolderImages.find(p => p.id === 'login-illustration');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,12 +69,55 @@ export default function LoginPage() {
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
+      <div className="hidden bg-primary text-primary-foreground lg:flex flex-col items-center justify-center p-12 text-center">
+        <div className="max-w-md">
+          <h2 className="text-4xl font-bold font-headline mb-4">Streamline Your Inventory</h2>
+          <p className="text-lg opacity-90 mb-8">
+            StockSync is a powerful, intuitive inventory management system designed to give you complete control over your stock, from procurement to sales.
+          </p>
+          <div className="space-y-6 text-left">
+            <div className="flex items-start gap-4">
+              <div className="bg-accent/20 p-2 rounded-full">
+                <Warehouse className="h-6 w-6 text-accent" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-xl">What is StockSync?</h3>
+                <p className="opacity-80">
+                  An all-in-one platform to track products, manage suppliers, handle purchase orders, and monitor stock levels in real-time.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="bg-accent/20 p-2 rounded-full">
+                <ShieldCheck className="h-6 w-6 text-accent" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-xl">Why is it reliable?</h3>
+                <p className="opacity-80">
+                  Built on a robust and secure architecture, StockSync ensures your data is always safe, accurate, and accessible when you need it.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="bg-accent/20 p-2 rounded-full">
+                <Smartphone className="h-6 w-6 text-accent" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-xl">Mobile App Available</h3>
+                <p className="opacity-80">
+                  Manage your inventory on the go. Our mobile app keeps you connected and in control, wherever you are.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[380px] gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-4xl font-bold font-headline text-primary">StockSync</h1>
             <p className="text-balance text-muted-foreground">
-              Manage your stock efficiently with StockSync.
+              Welcome back! Please log in to continue.
             </p>
           </div>
           <Card className="shadow-lg">
@@ -126,18 +167,6 @@ export default function LoginPage() {
             </form>
           </Card>
         </div>
-      </div>
-      <div className="hidden bg-muted lg:block relative">
-        {loginImage && (
-          <Image
-            src={loginImage.imageUrl}
-            alt={loginImage.description}
-            data-ai-hint={loginImage.imageHint}
-            fill
-            className="object-cover"
-            priority
-          />
-        )}
       </div>
     </div>
   );
