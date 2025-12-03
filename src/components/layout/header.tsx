@@ -19,7 +19,7 @@ export default function Header() {
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 sm:px-6">
       <SidebarTrigger className="md:hidden" />
       <div className="hidden md:block">
-        <h1 className="text-2xl font-semibold">Welcome Back, Admin 👋</h1>
+        <h1 className="text-2xl font-semibold">Welcome Back, Sushil Chaulagain</h1>
       </div>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <form className="ml-auto flex-1 sm:flex-initial">
