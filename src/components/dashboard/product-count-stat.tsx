@@ -27,9 +27,10 @@ export default function ProductCountStat() {
       }
 
       try {
-        const response = await fetch('https://localhost:7232/api/Product/count', {
+        const response = await fetch('https://localhost:7232/api/Product/Productcount', {
           headers: {
             'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           },
         });
 
@@ -42,6 +43,11 @@ export default function ProductCountStat() {
       } catch (error: any) {
         console.error('Error fetching product count:', error.message);
         setCount('N/A');
+        toast({
+          variant: 'destructive',
+          title: 'API Error',
+          description: error.message || 'Could not fetch product count from the server.',
+        });
       }
     };
     
