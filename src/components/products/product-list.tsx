@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -30,7 +29,7 @@ import { type Product } from '@/lib/types';
 import ProductForm from './product-form';
 import { z } from 'zod';
 
-const apiBaseUrl = 'https://localhost:7232/api/Product';
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Product`;
 
 const productFormSchema = z.object({
     productName: z.string().min(2, 'Product name is too short'),

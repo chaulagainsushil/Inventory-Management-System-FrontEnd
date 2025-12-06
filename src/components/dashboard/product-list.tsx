@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { type Product } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
-const apiBaseUrl = 'https://localhost:7232/api/Product';
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Product`;
 
 const getBadgeClassName = (quantity: number, reorderLevel: number) => {
   if (quantity === 0) {

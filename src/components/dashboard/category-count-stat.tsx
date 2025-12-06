@@ -27,7 +27,7 @@ export default function CategoryCountStat() {
       }
 
       try {
-        const response = await fetch('https://localhost:7232/api/Category/count', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Category/count`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -41,7 +41,6 @@ export default function CategoryCountStat() {
         const data = await response.json();
         setCount(data.totalCategories);
       } catch (error: any) {
-        console.error('Error fetching category count:', error.message);
         setCount('N/A');
         toast({
           variant: 'destructive',

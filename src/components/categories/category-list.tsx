@@ -38,7 +38,7 @@ import { useToast } from '@/hooks/use-toast';
 import { type Category } from '@/lib/types';
 import CategoryForm from './category-form';
 
-const apiBaseUrl = 'https://localhost:7232/api/Category';
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Category`;
 
 export default function CategoryList() {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -39,7 +39,7 @@ import { type Supplier } from '@/lib/types';
 import SupplierForm from './supplier-form';
 import { z } from 'zod';
 
-const apiBaseUrl = 'https://localhost:7232/api/SupplierInformation';
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/SupplierInformation`;
 
 const supplierFormSchema = z.object({
   name: z.string().min(2),

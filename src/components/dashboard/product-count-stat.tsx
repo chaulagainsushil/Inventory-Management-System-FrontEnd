@@ -5,7 +5,7 @@ import { Boxes } from 'lucide-react';
 import StatCard from '@/components/dashboard/stat-card';
 import { useToast } from '@/hooks/use-toast';
 
-const apiBaseUrl = 'https://localhost:7232/api/Product/Productcount';
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Product/Productcount`;
 
 export default function ProductCountStat() {
   const [count, setCount] = useState('...');
@@ -51,7 +51,6 @@ export default function ProductCountStat() {
           title: 'API Connection Error',
           description: 'Could not connect to the server. Please ensure the backend is running and CORS is configured correctly.',
         });
-        console.error('Error fetching product count:', error.message);
       }
     };
     
