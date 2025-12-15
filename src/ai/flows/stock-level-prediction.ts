@@ -11,10 +11,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 const StockLevelPredictionInputSchema = z.object({
-  monthlyRevenue: z.number().describe('The monthly revenue in USD.'),
-  totalProducts: z.number().int().describe('The total number of unique products in the inventory.'),
-  stockAlerts: z.number().int().describe('The number of products currently under the reorder level.'),
-  currentInventoryValue: z.number().describe('The current total value of the inventory in USD.'),
+  monthlyRevenue: z.coerce.number().describe('The monthly revenue in USD.'),
+  totalProducts: z.coerce.number().int().describe('The total number of unique products in the inventory.'),
+  stockAlerts: z.coerce.number().int().describe('The number of products currently under the reorder level.'),
+  currentInventoryValue: z.coerce.number().describe('The current total value of the inventory in USD.'),
 });
 export type StockLevelPredictionInput = z.infer<typeof StockLevelPredictionInputSchema>;
 
