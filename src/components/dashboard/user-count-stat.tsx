@@ -1,0 +1,59 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Users } from 'lucide-react';
+import StatCard from '@/components/dashboard/stat-card';
+import { useToast } from '@/hooks/use-toast';
+import { type User } from '@/lib/types';
+
+export default function UserCountStat() {
+  const [count, setCount] = useState('...');
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchUserCount = async (retries = 3) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
+      const token = localStorage.getItem('authToken');
+
+      if (!token) {
+        if (retries > 0) {
+          setTimeout(() => fetchUserCount(retries - 1), 500);
+        } else {
+          setCount('N/A');
+        }
+        return;
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Auth`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch users. Status: ${response.status}`);
+        }
+
+        const data: User[] = await response.json();
+        setCount(data.length.toString());
+      } catch (error: any) {
+        setCount('N/A');
+        toast({
+          variant: 'destructive',
+          title: 'API Error',
+          description: error.message || 'Could not fetch user count from the server.',
+        });
+      }
+    };
+    
+    fetchUserCount();
+
+  }, [toast]);
+
+  return <StatCard title="Total Users" value={count} icon={Users} />;
+}
