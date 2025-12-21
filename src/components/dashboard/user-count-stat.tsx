@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import StatCard from '@/components/dashboard/stat-card';
 import { useToast } from '@/hooks/use-toast';
-import { type User } from '@/lib/types';
 
 export default function UserCountStat() {
   const [count, setCount] = useState('...');
@@ -28,7 +27,7 @@ export default function UserCountStat() {
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Auth`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Auth/UserCount`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -36,11 +35,11 @@ export default function UserCountStat() {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch users. Status: ${response.status}`);
+          throw new Error(`Failed to fetch user count. Status: ${response.status}`);
         }
 
-        const data: User[] = await response.json();
-        setCount(data.length.toString());
+        const data = await response.json();
+        setCount(data.totalUsers.toString());
       } catch (error: any) {
         setCount('N/A');
         toast({
