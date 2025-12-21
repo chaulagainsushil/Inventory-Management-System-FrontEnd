@@ -25,3 +25,11 @@ export type Product = {
   quantityPerUnit: string;
   reoredLevel: number;
 };
+
+export type User = {
+  id: string;
+  fullName: string;
+  email: string;
+  userName: string;
+  roles: string[];
+};

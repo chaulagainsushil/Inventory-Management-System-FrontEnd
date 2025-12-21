@@ -31,7 +31,7 @@ const navItems = [
   { href: '#', icon: FileStack, label: 'Purchase Orders' },
   { href: '#', icon: ArrowRightLeft, label: 'Sales / Issue Goods' },
   { href: '#', icon: BarChartIcon, label: 'Reports' },
-  { href: '#', icon: UserPlus, label: 'Create User' },
+  { href: '/users', icon: UserPlus, label: 'Create User' },
   { href: '#', icon: Settings, label: 'Settings' },
 ];
 
