@@ -12,6 +12,7 @@ import ProductList from "@/components/dashboard/product-list";
 import CategoryCountStat from "@/components/dashboard/category-count-stat";
 import ProductCountStat from "@/components/dashboard/product-count-stat";
 import UserCountStat from "@/components/dashboard/user-count-stat";
+import MonthlyRevenueStat from "@/components/dashboard/monthly-revenue-stat";
 
 export const metadata: Metadata = {
   title: "Dashboard | StockSync",
@@ -31,7 +32,7 @@ export default function DashboardPage() {
               <ProductCountStat />
               <UserCountStat />
               <StatCard title="Stock Alerts" value="5" icon={AlertTriangle} variant="destructive" />
-              <StatCard title="Monthly Revenue" value="45231.89" icon={CreditCard} />
+              <MonthlyRevenueStat />
             </div>
 
             <InventoryMovementChart />
