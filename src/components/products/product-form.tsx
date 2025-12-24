@@ -56,29 +56,31 @@ export default function ProductForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      productName: product?.productName || '',
-      description: product?.description || '',
-      pricePerUnit: product?.pricePerUnit || 0,
-      sku: product?.sku || '',
-      quantityPerUnit: product?.quantityPerUnit || '',
-      reoredLevel: product?.reoredLevel || 0,
-      categoryId: product?.categoryId || 0,
-      supplierId: product?.supplierId || 0,
+      productName: '',
+      description: '',
+      pricePerUnit: 0,
+      sku: '',
+      quantityPerUnit: '',
+      reoredLevel: 0,
+      categoryId: 0,
+      supplierId: 0,
     },
   });
 
   React.useEffect(() => {
-    form.reset({
-      productName: product?.productName || '',
-      description: product?.description || '',
-      pricePerUnit: product?.pricePerUnit || 0,
-      sku: product?.sku || '',
-      quantityPerUnit: product?.quantityPerUnit || '',
-      reoredLevel: product?.reoredLevel || 0,
-      categoryId: product?.categoryId || 0,
-      supplierId: product?.supplierId || 0,
-    });
-  }, [product, form]);
+    if (isOpen) {
+        form.reset({
+          productName: product?.productName || '',
+          description: product?.description || '',
+          pricePerUnit: product?.pricePerUnit || 0,
+          sku: product?.sku || '',
+          quantityPerUnit: product?.quantityPerUnit || '',
+          reoredLevel: product?.reoredLevel || 0,
+          categoryId: product?.categoryId || 0,
+          supplierId: product?.supplierId || 0,
+        });
+    }
+  }, [product, form, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

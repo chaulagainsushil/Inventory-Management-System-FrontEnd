@@ -106,6 +106,11 @@ export default function ProductList() {
     setIsFormOpen(true);
   };
 
+  const handleEditClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsFormOpen(true);
+  };
+
   const handleFormSubmit = async (values: z.infer<typeof productFormSchema>) => {
     setFormLoading(true);
     const headers = getAuthHeaders();
@@ -119,7 +124,7 @@ export default function ProductList() {
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/${selectedProduct.id}` : apiBaseUrl;
     
-    const body = JSON.stringify(values);
+    const body = JSON.stringify(isEditing ? { ...values, id: selectedProduct.id } : values);
 
     try {
       const response = await fetch(url, {
@@ -204,7 +209,7 @@ export default function ProductList() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditClick(product)}>
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-destructive">
