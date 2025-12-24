@@ -31,7 +31,7 @@ export default function DashboardPage() {
               <ProductCountStat />
               <UserCountStat />
               <StatCard title="Stock Alerts" value="5" icon={AlertTriangle} variant="destructive" />
-              <StatCard title="Revenue" value="45231.89" icon={CreditCard} />
+              <StatCard title="Monthly Revenue" value="45231.89" icon={CreditCard} />
             </div>
 
             <InventoryMovementChart />
