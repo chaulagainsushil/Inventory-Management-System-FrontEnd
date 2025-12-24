@@ -37,13 +37,14 @@ export default function DashboardPage() {
 
             <InventoryMovementChart />
 
-            <StockReportChart />
-            
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <ProductList />
               </div>
-              <SalesStatsChart />
+              <div className="space-y-6">
+                <StockReportChart />
+                <SalesStatsChart />
+              </div>
             </div>
           </main>
         </SidebarInset>

@@ -11,51 +11,48 @@ export default function MonthlyRevenueStat() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchMonthlyRevenue = async (retries = 3) => {
-      if (typeof window === 'undefined') {
-        return;
-      }
-      
+    const fetchMonthlyRevenue = async () => {
       const token = localStorage.getItem('authToken');
-
       if (!token) {
-        if (retries > 0) {
-          setTimeout(() => fetchMonthlyRevenue(retries - 1), 500);
-        } else {
-          setRevenue('N/A');
-        }
+        setRevenue('N/A');
         return;
       }
-
+  
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Sales/monthly-revenue`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        });
-
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/Sales/monthly-revenue`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
         if (!response.ok) {
-          throw new Error(`Failed to fetch monthly revenue. Status: ${response.status}`);
+          throw new Error(`Status: ${response.status}`);
         }
-
+  
         const data = await response.json();
-        // Assuming the API returns a number directly or an object like { monthlyRevenue: 12345.67 }
-        const revenueValue = typeof data === 'number' ? data : data.monthlyRevenue;
+  
+        const revenueValue =
+          typeof data === 'number'
+            ? data
+            : Number(data.totalRevenue);
+  
         setRevenue(revenueValue.toFixed(2));
       } catch (error: any) {
         setRevenue('N/A');
         toast({
           variant: 'destructive',
           title: 'API Error',
-          description: error.message || 'Could not fetch monthly revenue from the server.',
+          description: error.message,
         });
       }
     };
-    
+  
     fetchMonthlyRevenue();
-
   }, [toast]);
+  
 
   return <StatCard title="Monthly Revenue" value={revenue} icon={CreditCard} />;
 }

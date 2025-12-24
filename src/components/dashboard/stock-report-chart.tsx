@@ -25,13 +25,13 @@ const chartConfig = {
 
 export default function StockReportChart() {
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
         <CardTitle>Stock Report</CardTitle>
         <CardDescription>Monthly Stock In vs. Stock Out</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+        <ChartContainer config={chartConfig} className="h-[200px] w-full">
           <BarChart data={chartData} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis
