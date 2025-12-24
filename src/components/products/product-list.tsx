@@ -159,9 +159,9 @@ export default function ProductList() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Product Management</h1>
-        <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Product Management</h1>
+        <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" /> Add Product
         </Button>
       </div>
@@ -177,57 +177,59 @@ export default function ProductList() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Reorder Level</TableHead>
-                  <TableHead className="w-[100px] text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.length > 0 ? products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>{product.id}</TableCell>
-                    <TableCell className="font-medium">{product.productName}</TableCell>
-                    <TableCell>{product.description}</TableCell>
-                    <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
-                    <TableCell>{product.sku}</TableCell>
-                    <TableCell>{product.quantityPerUnit}</TableCell>
-                    <TableCell>{product.reoredLevel}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEditClick(product)}>
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                )) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center h-24">
-                      No products found.
-                    </TableCell>
+                    <TableHead className="w-[50px]">ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden md:table-cell">Description</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="hidden sm:table-cell">SKU</TableHead>
+                    <TableHead className="hidden sm:table-cell">Quantity</TableHead>
+                    <TableHead className="hidden lg:table-cell">Reorder Level</TableHead>
+                    <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {products.length > 0 ? products.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>{product.id}</TableCell>
+                      <TableCell className="font-medium">{product.productName}</TableCell>
+                      <TableCell className="hidden md:table-cell max-w-[250px] truncate">{product.description}</TableCell>
+                      <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{product.sku}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{product.quantityPerUnit}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{product.reoredLevel}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditClick(product)}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center h-24">
+                        No products found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

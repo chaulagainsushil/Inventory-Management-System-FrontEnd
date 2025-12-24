@@ -112,8 +112,8 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[380px] gap-6">
+      <div className="flex items-center justify-center py-12 px-4">
+        <div className="mx-auto w-full max-w-sm space-y-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-4xl font-bold font-headline text-primary">StockSync</h1>
             <p className="text-balance text-muted-foreground">

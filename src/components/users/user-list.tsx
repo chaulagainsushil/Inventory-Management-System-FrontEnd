@@ -133,9 +133,9 @@ export default function UserList() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">User Management</h1>
-        <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">User Management</h1>
+        <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" /> Add User
         </Button>
       </div>
@@ -151,44 +151,46 @@ export default function UserList() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Full Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Username</TableHead>
-                  <TableHead>Roles</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.length > 0 ? (
-                  users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-mono text-xs">{user.id}</TableCell>
-                      <TableCell className="font-medium">{user.fullName}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.userName}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {user.roles.map((role) => (
-                            <Badge key={role} variant="secondary" className="font-normal">
-                              {role}
-                            </Badge>
-                          ))}
-                        </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="hidden sm:table-cell">ID</TableHead>
+                    <TableHead>Full Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead className="hidden md:table-cell">Username</TableHead>
+                    <TableHead>Roles</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="hidden sm:table-cell font-mono text-xs max-w-[150px] truncate">{user.id}</TableCell>
+                        <TableCell className="font-medium">{user.fullName}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell className="hidden md:table-cell">{user.userName}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {user.roles.map((role) => (
+                              <Badge key={role} variant="secondary" className="font-normal">
+                                {role}
+                              </Badge>
+                            ))}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center h-24">
+                        No users found.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
-                      No users found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
