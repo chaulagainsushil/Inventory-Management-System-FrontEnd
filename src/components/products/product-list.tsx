@@ -196,7 +196,7 @@ export default function ProductList() {
                     <TableCell>{product.id}</TableCell>
                     <TableCell className="font-medium">{product.productName}</TableCell>
                     <TableCell>{product.description}</TableCell>
-                    <TableCell>${product.pricePerUnit.toFixed(2)}</TableCell>
+                    <TableCell>{product.pricePerUnit.toFixed(2)}</TableCell>
                     <TableCell>{product.sku}</TableCell>
                     <TableCell>{product.quantityPerUnit}</TableCell>
                     <TableCell>{product.reoredLevel}</TableCell>

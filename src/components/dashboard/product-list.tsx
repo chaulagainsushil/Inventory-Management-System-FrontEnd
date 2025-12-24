@@ -116,7 +116,7 @@ export default function ProductList() {
                     <TableCell className="font-medium">{product.productName}</TableCell>
                     <TableCell className="hidden md:table-cell">{product.quantityPerUnit}</TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      ${product.pricePerUnit.toFixed(2)}
+                      {product.pricePerUnit.toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Badge
