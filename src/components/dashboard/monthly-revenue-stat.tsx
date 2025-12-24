@@ -54,5 +54,5 @@ export default function MonthlyRevenueStat() {
   }, [toast]);
   
 
-  return <StatCard title="Monthly Revenue" value={revenue} icon={CreditCard} />;
+  return <StatCard title="Monthly Revenue" value={revenue === '...' || revenue === 'N/A' ? revenue : `Rs. ${revenue}`} icon={CreditCard} />;
 }
