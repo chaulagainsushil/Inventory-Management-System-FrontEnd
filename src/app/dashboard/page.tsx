@@ -7,7 +7,6 @@ import StatCard from "@/components/dashboard/stat-card";
 import { Boxes, LayoutGrid, AlertTriangle, DollarSign, Users } from "lucide-react";
 import InventoryMovementChart from "@/components/dashboard/inventory-movement-chart";
 import StockReportChart from "@/components/dashboard/stock-report-chart";
-import TargetPrediction from "@/components/dashboard/target-prediction";
 import SalesStatsChart from "@/components/dashboard/sales-stats-chart";
 import ProductList from "@/components/dashboard/product-list";
 import CategoryCountStat from "@/components/dashboard/category-count-stat";
@@ -37,10 +36,7 @@ export default function DashboardPage() {
 
             <InventoryMovementChart />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <StockReportChart />
-              <TargetPrediction />
-            </div>
+            <StockReportChart />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
