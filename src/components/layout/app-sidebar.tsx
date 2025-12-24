@@ -19,6 +19,7 @@ import {
   Settings,
   LogOut,
   UserPlus,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ const navItems = [
   { href: '/products', icon: Boxes, label: 'Products' },
   { href: '/categories', icon: LayoutGrid, label: 'Categories' },
   { href: '/suppliers', icon: Truck, label: 'Suppliers' },
+  { href: '/customers', icon: Users, label: 'Customers' },
   { href: '#', icon: FileStack, label: 'Purchase Orders' },
   { href: '#', icon: ArrowRightLeft, label: 'Sales / Issue Goods' },
   { href: '#', icon: BarChartIcon, label: 'Reports' },
