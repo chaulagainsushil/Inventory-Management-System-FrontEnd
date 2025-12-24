@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/layout/app-sidebar";
@@ -27,8 +28,8 @@ export default function DashboardPage() {
           <Header />
           <main className="p-4 sm:p-6 lg:p-8 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              <ProductCountStat />
               <CategoryCountStat />
+              <ProductCountStat />
               <UserCountStat />
               <StatCard title="Stock Alerts" value="5" icon={AlertTriangle} variant="destructive" />
               <StatCard title="Monthly Revenue" value="$45,231.89" icon={DollarSign} />
