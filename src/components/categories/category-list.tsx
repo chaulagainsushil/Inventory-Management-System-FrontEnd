@@ -49,7 +49,7 @@ export default function CategoryList() {
   const [formLoading, setFormLoading] = useState(false);
   const { toast } = useToast();
 
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
       toast({
@@ -65,7 +65,7 @@ export default function CategoryList() {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     };
-  };
+  }, [toast]);
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
@@ -80,7 +80,7 @@ export default function CategoryList() {
         if (response.status === 401) {
           throw new Error('Your session has expired. Please log in again.');
         }
-        throw new Error('Failed to fetch categories. The server might be down.');
+        throw new Error('Failed to fetch categories. The server might be down or experiencing issues.');
       }
       const data = await response.json();
       setCategories(data);
@@ -93,7 +93,7 @@ export default function CategoryList() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, getAuthHeaders]);
 
   useEffect(() => {
     fetchCategories();
@@ -219,7 +219,7 @@ export default function CategoryList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[80px]">ID</TableHead>
+                    <TableHead className="w-[80px] hidden sm:table-cell">ID</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead className="hidden md:table-cell">Description</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
@@ -228,7 +228,7 @@ export default function CategoryList() {
                 <TableBody>
                   {categories.map((category) => (
                     <TableRow key={category.id}>
-                      <TableCell>{category.id}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{category.id}</TableCell>
                       <TableCell className="font-medium">{category.name}</TableCell>
                       <TableCell className="hidden md:table-cell max-w-[300px] truncate">{category.description}</TableCell>
                       <TableCell className="text-right">

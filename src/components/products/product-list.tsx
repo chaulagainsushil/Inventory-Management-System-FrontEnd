@@ -183,11 +183,11 @@ export default function ProductList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[50px]">ID</TableHead>
+                    <TableHead className="w-[50px] hidden sm:table-cell">ID</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden md:table-cell">Description</TableHead>
+                    <TableHead className="hidden lg:table-cell">Description</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead className="hidden sm:table-cell">SKU</TableHead>
+                    <TableHead className="hidden md:table-cell">SKU</TableHead>
                     <TableHead className="hidden sm:table-cell">Quantity</TableHead>
                     <TableHead className="hidden lg:table-cell">Reorder Level</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
@@ -196,11 +196,11 @@ export default function ProductList() {
                 <TableBody>
                   {products.length > 0 ? products.map((product) => (
                     <TableRow key={product.id}>
-                      <TableCell>{product.id}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{product.id}</TableCell>
                       <TableCell className="font-medium">{product.productName}</TableCell>
-                      <TableCell className="hidden md:table-cell max-w-[250px] truncate">{product.description}</TableCell>
+                      <TableCell className="hidden lg:table-cell max-w-[250px] truncate">{product.description}</TableCell>
                       <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{product.sku}</TableCell>
+                      <TableCell className="hidden md:table-cell">{product.sku}</TableCell>
                       <TableCell className="hidden sm:table-cell">{product.quantityPerUnit}</TableCell>
                       <TableCell className="hidden lg:table-cell">{product.reoredLevel}</TableCell>
                       <TableCell className="text-right">

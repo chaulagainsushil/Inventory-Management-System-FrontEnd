@@ -139,7 +139,7 @@ export default function SupplierList() {
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/${selectedSupplier.id}` : apiBaseUrl;
     
-    const body = JSON.stringify(values);
+    const body = JSON.stringify(isEditing ? { id: selectedSupplier.id, ...values } : values);
 
     try {
       const response = await fetch(url, {
@@ -233,11 +233,11 @@ export default function SupplierList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[80px]">ID</TableHead>
+                    <TableHead className="w-[80px] hidden sm:table-cell">ID</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Contact Person</TableHead>
-                    <TableHead className="hidden md:table-cell">Phone</TableHead>
-                    <TableHead className="hidden md:table-cell">Email</TableHead>
+                    <TableHead className="hidden md:table-cell">Contact Person</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead className="hidden lg:table-cell">Email</TableHead>
                     <TableHead className="hidden lg:table-cell">Address</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
@@ -245,11 +245,11 @@ export default function SupplierList() {
                 <TableBody>
                   {suppliers.length > 0 ? suppliers.map((supplier) => (
                     <TableRow key={supplier.id}>
-                      <TableCell>{supplier.id}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{supplier.id}</TableCell>
                       <TableCell className="font-medium">{supplier.name}</TableCell>
-                      <TableCell>{supplier.contactPerson}</TableCell>
-                      <TableCell className="hidden md:table-cell">{supplier.phoneNumber}</TableCell>
-                      <TableCell className="hidden md:table-cell">{supplier.email}</TableCell>
+                      <TableCell className="hidden md:table-cell">{supplier.contactPerson}</TableCell>
+                      <TableCell>{supplier.phoneNumber}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{supplier.email}</TableCell>
                       <TableCell className="hidden lg:table-cell max-w-[200px] truncate">{supplier.address}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>

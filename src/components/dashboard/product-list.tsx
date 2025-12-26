@@ -89,8 +89,6 @@ export default function ProductList() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const productImages = PlaceHolderImages.filter((p) => p.id.startsWith('product-'));
-
   return (
     <Card>
       <CardHeader>

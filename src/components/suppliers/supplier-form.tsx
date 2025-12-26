@@ -62,23 +62,25 @@ export default function SupplierForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: supplier?.name || '',
-      contactPerson: supplier?.contactPerson || '',
-      phoneNumber: supplier?.phoneNumber || '',
-      email: supplier?.email || '',
-      address: supplier?.address || '',
+      name: '',
+      contactPerson: '',
+      phoneNumber: '',
+      email: '',
+      address: '',
     },
   });
 
   React.useEffect(() => {
-    form.reset({
-      name: supplier?.name || '',
-      contactPerson: supplier?.contactPerson || '',
-      phoneNumber: supplier?.phoneNumber || '',
-      email: supplier?.email || '',
-      address: supplier?.address || '',
-    });
-  }, [supplier, form]);
+    if (isOpen) {
+        form.reset({
+          name: supplier?.name || '',
+          contactPerson: supplier?.contactPerson || '',
+          phoneNumber: supplier?.phoneNumber || '',
+          email: supplier?.email || '',
+          address: supplier?.address || '',
+        });
+    }
+  }, [supplier, form, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -87,12 +89,12 @@ export default function SupplierForm({
           <DialogTitle>{supplier ? 'Edit Supplier' : 'Add Supplier'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="md:col-span-2">
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Global Tech Supplies" {...field} />
@@ -131,7 +133,7 @@ export default function SupplierForm({
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="md:col-span-2">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., contact@globaltech.com" {...field} />
@@ -144,7 +146,7 @@ export default function SupplierForm({
               control={form.control}
               name="address"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="md:col-span-2">
                   <FormLabel>Address</FormLabel>
                   <FormControl>
                     <Textarea
@@ -156,7 +158,7 @@ export default function SupplierForm({
                 </FormItem>
               )}
             />
-            <DialogFooter>
+            <DialogFooter className="md:col-span-2 mt-4">
               <DialogClose asChild>
                 <Button type="button" variant="secondary" disabled={loading}>
                   Cancel
