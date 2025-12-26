@@ -37,7 +37,10 @@ export default function ProductCountStat() {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch product count. Status: ${response.status}`);
+          if (response.status === 401) {
+            throw new Error('Your session has expired. Please log in again.');
+          }
+          throw new Error('The server could not process the request for product count.');
         }
 
         const data = await response.json();
@@ -48,8 +51,8 @@ export default function ProductCountStat() {
         setShouldRetry(false); // Stop retrying on network errors
         toast({
           variant: 'destructive',
-          title: 'API Connection Error',
-          description: 'Could not connect to the server. Please ensure the backend is running and CORS is configured correctly.',
+          title: 'API Error',
+          description: error.message || 'Could not fetch product count from the server.',
         });
       }
     };

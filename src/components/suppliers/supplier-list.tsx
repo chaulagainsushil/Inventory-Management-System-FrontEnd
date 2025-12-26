@@ -62,13 +62,18 @@ export default function SupplierList() {
     if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('authToken');
     if (!token) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to manage suppliers. Please log in again.',
+      });
       return null;
     }
     return {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     };
-  }, []);
+  }, [toast]);
 
   const fetchSuppliers = useCallback(async (retries = 3) => {
     const headers = getAuthHeaders();
@@ -76,11 +81,6 @@ export default function SupplierList() {
       if (retries > 0) {
         setTimeout(() => fetchSuppliers(retries - 1), 500);
       } else {
-        toast({
-            variant: 'destructive',
-            title: 'Authentication Error',
-            description: 'Could not find auth token. Please log in again.',
-        });
         setLoading(false);
       }
       return;
@@ -90,15 +90,18 @@ export default function SupplierList() {
     try {
       const response = await fetch(apiBaseUrl, { headers });
       if (!response.ok) {
-        throw new Error('Failed to fetch suppliers');
+        if (response.status === 401) {
+          throw new Error('Your session has expired. Please log in again.');
+        }
+        throw new Error('Failed to fetch suppliers. The server might be down or experiencing issues.');
       }
       const data = await response.json();
       setSuppliers(data);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not fetch suppliers. Is your API server running and are you logged in?',
+        title: 'Error Fetching Suppliers',
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setLoading(false);
@@ -128,7 +131,6 @@ export default function SupplierList() {
     setFormLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to perform this action.' });
         setFormLoading(false);
         return;
     }
@@ -148,7 +150,7 @@ export default function SupplierList() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Server error: ${errorData || 'Failed to process request'}`);
+        throw new Error(errorData || `Server error: Failed to ${isEditing ? 'update' : 'create'} supplier.`);
       }
       
       toast({
@@ -162,7 +164,7 @@ export default function SupplierList() {
       toast({
         variant: 'destructive',
         title: 'Operation Failed',
-        description: `Could not ${isEditing ? 'update' : 'create'} supplier. ${error.message}`,
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setFormLoading(false);
@@ -175,7 +177,6 @@ export default function SupplierList() {
 
     const headers = getAuthHeaders();
     if (!headers) {
-        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to perform this action.' });
         setFormLoading(false);
         return;
     }
@@ -185,7 +186,10 @@ export default function SupplierList() {
         method: 'DELETE',
         headers,
       });
-      if (!response.ok) throw new Error('Failed to delete supplier');
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Failed to delete supplier');
+      }
 
       toast({
         title: 'Success',
@@ -194,11 +198,11 @@ export default function SupplierList() {
 
       setIsDeleteAlertOpen(false);
       fetchSuppliers(); // Refresh list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not delete supplier.',
+        title: 'Deletion Failed',
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setFormLoading(false);

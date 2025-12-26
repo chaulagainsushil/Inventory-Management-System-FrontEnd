@@ -54,7 +54,7 @@ export default function ProductList() {
           toast({
             variant: 'destructive',
             title: 'Authentication Error',
-            description: 'Could not find auth token. Please log in again.',
+            description: 'Could not find auth token. Please log in to see products.',
           });
           setLoading(false);
         }
@@ -65,15 +65,18 @@ export default function ProductList() {
       try {
         const response = await fetch(apiBaseUrl, { headers });
         if (!response.ok) {
-          throw new Error('Failed to fetch products');
+          if (response.status === 401) {
+            throw new Error('Your session has expired. Please log in again.');
+          }
+          throw new Error('Failed to fetch products from the server.');
         }
         const data = await response.json();
         setProducts(data);
-      } catch (error) {
+      } catch (error: any) {
         toast({
           variant: 'destructive',
-          title: 'Error',
-          description: 'Could not fetch products for dashboard list.',
+          title: 'Error Fetching Products',
+          description: error.message || 'An unknown error occurred.',
         });
       } finally {
         setLoading(false);

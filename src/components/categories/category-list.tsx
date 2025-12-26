@@ -51,6 +51,16 @@ export default function CategoryList() {
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');
+    if (!token) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to perform this action. Redirecting to login.',
+      });
+      // Optionally redirect to login
+      // window.location.href = '/';
+      return null;
+    }
     return {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -59,16 +69,26 @@ export default function CategoryList() {
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
+    const headers = getAuthHeaders();
+    if (!headers) {
+      setLoading(false);
+      return;
+    }
     try {
-      const response = await fetch(apiBaseUrl, { headers: getAuthHeaders() });
-      if (!response.ok) throw new Error('Failed to fetch categories');
+      const response = await fetch(apiBaseUrl, { headers });
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Your session has expired. Please log in again.');
+        }
+        throw new Error('Failed to fetch categories. The server might be down.');
+      }
       const data = await response.json();
       setCategories(data);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not fetch categories. Is your token valid?',
+        title: 'Error Fetching Categories',
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setLoading(false);
@@ -96,6 +116,12 @@ export default function CategoryList() {
 
   const handleFormSubmit = async (values: { name: string; description: string }) => {
     setFormLoading(true);
+    const headers = getAuthHeaders();
+    if (!headers) {
+      setFormLoading(false);
+      return;
+    }
+
     const isEditing = !!selectedCategory;
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/${selectedCategory.id}` : apiBaseUrl;
@@ -105,12 +131,13 @@ export default function CategoryList() {
     try {
       const response = await fetch(url, {
         method,
-        headers: getAuthHeaders(),
+        headers,
         body,
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} category`);
+        const errorData = await response.text();
+        throw new Error(errorData || `Failed to ${isEditing ? 'update' : 'create'} category`);
       }
       
       toast({
@@ -120,11 +147,11 @@ export default function CategoryList() {
 
       setIsFormOpen(false);
       fetchCategories(); // Refresh list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: `Could not ${isEditing ? 'update' : 'create'} category.`,
+        title: 'Operation Failed',
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setFormLoading(false);
@@ -134,13 +161,21 @@ export default function CategoryList() {
   const handleDeleteConfirm = async () => {
     if (!selectedCategory) return;
     setFormLoading(true);
+    const headers = getAuthHeaders();
+    if (!headers) {
+      setFormLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${apiBaseUrl}/${selectedCategory.id}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
+        headers,
       });
-      if (!response.ok) throw new Error('Failed to delete category');
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Failed to delete category');
+      }
 
       toast({
         title: 'Success',
@@ -149,11 +184,11 @@ export default function CategoryList() {
 
       setIsDeleteAlertOpen(false);
       fetchCategories(); // Refresh list
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not delete category.',
+        title: 'Deletion Failed',
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setFormLoading(false);
@@ -186,7 +221,7 @@ export default function CategoryList() {
                   <TableRow>
                     <TableHead className="w-[80px]">ID</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Description</TableHead>
+                    <TableHead className="hidden md:table-cell">Description</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -195,7 +230,7 @@ export default function CategoryList() {
                     <TableRow key={category.id}>
                       <TableCell>{category.id}</TableCell>
                       <TableCell className="font-medium">{category.name}</TableCell>
-                      <TableCell className="max-w-[300px] truncate">{category.description}</TableCell>
+                      <TableCell className="hidden md:table-cell max-w-[300px] truncate">{category.description}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

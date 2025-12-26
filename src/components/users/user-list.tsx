@@ -42,12 +42,19 @@ export default function UserList() {
   const getAuthHeaders = useCallback(() => {
     if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('authToken');
-    if (!token) return null;
+    if (!token) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to manage users. Please log in again.',
+      });
+      return null;
+    }
     return {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     };
-  }, []);
+  }, [toast]);
 
   const fetchUsers = useCallback(async (retries = 3) => {
     const headers = getAuthHeaders();
@@ -55,11 +62,6 @@ export default function UserList() {
       if (retries > 0) {
         setTimeout(() => fetchUsers(retries - 1), 500);
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Authentication Error',
-          description: 'Could not find auth token. Please log in again.',
-        });
         setLoading(false);
       }
       return;
@@ -69,15 +71,18 @@ export default function UserList() {
     try {
       const response = await fetch(apiBaseUrl, { headers });
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        if (response.status === 401) {
+          throw new Error('Your session has expired. Please log in again.');
+        }
+        throw new Error('Failed to fetch users. The server might be down or experiencing issues.');
       }
       const data = await response.json();
       setUsers(data);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not fetch users. Is your API server running and are you logged in?',
+        title: 'Error Fetching Users',
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setLoading(false);
@@ -96,7 +101,6 @@ export default function UserList() {
     setFormLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-      toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be logged in to perform this action.' });
       setFormLoading(false);
       return;
     }
@@ -110,7 +114,7 @@ export default function UserList() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Server error: ${errorData || 'Failed to create user'}`);
+        throw new Error(errorData || 'Server error: Failed to create user');
       }
 
       toast({
@@ -124,7 +128,7 @@ export default function UserList() {
       toast({
         variant: 'destructive',
         title: 'Operation Failed',
-        description: `Could not create user. ${error.message}`,
+        description: error.message || 'An unknown error occurred.',
       });
     } finally {
       setFormLoading(false);

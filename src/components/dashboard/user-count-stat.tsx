@@ -35,7 +35,10 @@ export default function UserCountStat() {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch user count. Status: ${response.status}`);
+           if (response.status === 401) {
+            throw new Error('Your session has expired. Please log in again.');
+          }
+          throw new Error('The server could not process the request for user count.');
         }
 
         const data = await response.json();

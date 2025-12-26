@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,7 +28,10 @@ export default function MonthlyRevenueStat() {
         );
   
         if (!response.ok) {
-          throw new Error(`Status: ${response.status}`);
+           if (response.status === 401) {
+            throw new Error('Your session has expired. Please log in again.');
+          }
+          throw new Error('The server could not process the request for monthly revenue.');
         }
   
         const data = await response.json();
@@ -45,7 +47,7 @@ export default function MonthlyRevenueStat() {
         toast({
           variant: 'destructive',
           title: 'API Error',
-          description: error.message,
+          description: error.message || 'An unknown error occurred while fetching revenue.',
         });
       }
     };

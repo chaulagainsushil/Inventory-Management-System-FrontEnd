@@ -35,7 +35,10 @@ export default function CategoryCountStat() {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch category count. Status: ${response.status}`);
+           if (response.status === 401) {
+            throw new Error('Your session has expired. Please log in again.');
+          }
+          throw new Error('The server could not process the request.');
         }
 
         const data = await response.json();
@@ -45,7 +48,7 @@ export default function CategoryCountStat() {
         toast({
           variant: 'destructive',
           title: 'API Error',
-          description: error.message || 'Could not fetch category count from the server.',
+          description: error.message || 'Could not fetch category count.',
         });
       }
     };

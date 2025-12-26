@@ -45,22 +45,22 @@ export default function LoginPage() {
           toast({
             variant: 'destructive',
             title: 'Login Failed',
-            description: 'Authentication token was not provided.',
+            description: 'Authentication token was not provided by the server.',
           });
         }
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => null);
         toast({
           variant: 'destructive',
           title: 'Login Failed',
-          description: errorData.message || 'Invalid credentials. Please try again.',
+          description: errorData?.message || 'Invalid credentials or server error. Please try again.',
         });
       }
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'An Error Occurred',
-        description: 'Could not connect to the server. Please check your connection and try again.',
+        title: 'Network Error',
+        description: 'Could not connect to the server. Please check your internet connection and try again.',
       });
     } finally {
       setLoading(false);
