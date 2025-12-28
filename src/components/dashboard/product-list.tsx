@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -123,11 +124,11 @@ export default function ProductList() {
                       <Badge
                         className={cn(
                           'capitalize',
-                          getBadgeClassName(product.stockQuantity, product.reoredLevel)
+                          getBadgeClassName(product.stockQuantity, product.reorderLevel)
                         )}
                         variant="secondary"
                       >
-                        {getStatus(product.stockQuantity, product.reoredLevel)}
+                        {getStatus(product.stockQuantity, product.reorderLevel)}
                       </Badge>
                     </TableCell>
                   </TableRow>

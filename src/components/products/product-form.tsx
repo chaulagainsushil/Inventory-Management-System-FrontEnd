@@ -42,7 +42,7 @@ const formSchema = z.object({
   pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number.'),
   sku: z.string().min(1, 'SKU is required.'),
   stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a positive integer.'),
-  reoredLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer.'),
+  reorderLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
 });
@@ -79,7 +79,7 @@ export default function ProductForm({
       pricePerUnit: 0,
       sku: '',
       stockQuantity: 0,
-      reoredLevel: 0,
+      reorderLevel: 0,
       categoryId: 0,
       supplierId: 0,
     },
@@ -114,7 +114,7 @@ export default function ProductForm({
         pricePerUnit: product?.pricePerUnit || 0,
         sku: product?.sku || '',
         stockQuantity: product?.stockQuantity || 0,
-        reoredLevel: product?.reoredLevel || 0,
+        reorderLevel: product?.reorderLevel || 0,
         categoryId: product?.categoryId || 0,
         supplierId: product?.supplierId || 0,
       });
@@ -211,7 +211,7 @@ export default function ProductForm({
             />
             <FormField
               control={form.control}
-              name="reoredLevel"
+              name="reorderLevel"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Reorder Level</FormLabel>

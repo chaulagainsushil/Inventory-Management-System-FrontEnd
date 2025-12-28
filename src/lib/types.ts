@@ -24,7 +24,7 @@ export type Product = {
   pricePerUnit: number;
   sku: string;
   stockQuantity: number;
-  reoredLevel: number;
+  reorderLevel: number;
 };
 
 export type User = {

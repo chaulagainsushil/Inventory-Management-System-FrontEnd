@@ -39,7 +39,7 @@ const productFormSchema = z.object({
   pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
   sku: z.string().min(1, 'SKU is required'),
   stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a positive integer.'),
-  reoredLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer'),
+  reorderLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer'),
   categoryId: z.coerce.number().int().min(1, 'Category is required'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
 });
@@ -223,7 +223,7 @@ export default function ProductList() {
                         <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
                         <TableCell className="hidden md:table-cell">{product.sku}</TableCell>
                         <TableCell className="hidden sm:table-cell">{product.stockQuantity}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{product.reoredLevel}</TableCell>
+                        <TableCell className="hidden lg:table-cell">{product.reorderLevel}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
