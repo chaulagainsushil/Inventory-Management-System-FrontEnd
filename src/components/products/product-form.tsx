@@ -89,7 +89,7 @@ export default function ProductForm({
     async function fetchCategories() {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        toast({ variant: 'destructive', title: 'Authentication Error', description: 'Please log in again.' });
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'Your session has expired. Please log in again.' });
         return;
       }
 
@@ -97,11 +97,11 @@ export default function ProductForm({
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Category/Categorydropdown`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!response.ok) throw new Error('Failed to fetch categories');
+        if (!response.ok) throw new Error('Failed to fetch categories. The server might be unavailable.');
         const data = await response.json();
         setCategories(data);
-      } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not load categories.' });
+      } catch (error: any) {
+        toast({ variant: 'destructive', title: 'Error', description: error.message || 'Could not load categories.' });
       }
     }
 

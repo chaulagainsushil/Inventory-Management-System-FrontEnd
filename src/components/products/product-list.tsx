@@ -93,7 +93,7 @@ export default function ProductList() {
           throw new Error('Failed to fetch products. The server might be down or experiencing issues.');
         }
         if (!categoriesResponse.ok) {
-          throw new Error('Failed to fetch categories.');
+          throw new Error('Failed to fetch categories. The server might be unavailable.');
         }
 
         const productsData = await productsResponse.json();
