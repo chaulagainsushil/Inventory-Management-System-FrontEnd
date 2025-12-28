@@ -20,9 +20,10 @@ export type Product = {
   supplierId: number;
   productName: string;
   description: string;
+  pricePerUnitPurchased: number;
   pricePerUnit: number;
   sku: string;
-  quantityPerUnit: string;
+  stockQuantity: number;
   reoredLevel: number;
 };
 

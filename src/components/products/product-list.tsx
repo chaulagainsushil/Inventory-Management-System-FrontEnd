@@ -32,15 +32,16 @@ import { z } from 'zod';
 const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Product`;
 
 const productFormSchema = z.object({
-    productName: z.string().min(2, 'Product name is too short'),
-    description: z.string().min(5, 'Description is too short'),
-    pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
-    sku: z.string().min(1, 'SKU is required'),
-    quantityPerUnit: z.string().min(1, 'Quantity is required'),
-    reoredLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer'),
-    categoryId: z.coerce.number().int().min(1, 'Category ID is required'),
-    supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
-  });
+  productName: z.string().min(2, 'Product name is too short'),
+  description: z.string().min(5, 'Description is too short'),
+  pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase Price must be a positive number.'),
+  pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
+  sku: z.string().min(1, 'SKU is required'),
+  stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a positive integer.'),
+  reoredLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer'),
+  categoryId: z.coerce.number().int().min(1, 'Category ID is required'),
+  supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
+});
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,10 +55,11 @@ export default function ProductList() {
     if (typeof window === 'undefined') return null;
     const token = localStorage.getItem('authToken');
     if (!token) {
-       toast({
+      toast({
         variant: 'destructive',
         title: 'Authentication Error',
-        description: 'You must be logged in to manage products. Please log in again.',
+        description:
+          'You must be logged in to manage products. Please log in again.',
       });
       return null;
     }
@@ -67,38 +69,43 @@ export default function ProductList() {
     };
   }, [toast]);
 
-  const fetchProducts = useCallback(async (retries = 3) => {
-    const headers = getAuthHeaders();
-    if (!headers) {
-      if (retries > 0) {
-        setTimeout(() => fetchProducts(retries - 1), 500);
-      } else {
+  const fetchProducts = useCallback(
+    async (retries = 3) => {
+      const headers = getAuthHeaders();
+      if (!headers) {
+        if (retries > 0) {
+          setTimeout(() => fetchProducts(retries - 1), 500);
+        } else {
+          setLoading(false);
+        }
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await fetch(apiBaseUrl, { headers });
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Your session has expired. Please log in again.');
+          }
+          throw new Error(
+            'Failed to fetch products. The server might be down or experiencing issues.'
+          );
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (error: any) {
+        toast({
+          variant: 'destructive',
+          title: 'Error Fetching Products',
+          description: error.message || 'An unknown error occurred.',
+        });
+      } finally {
         setLoading(false);
       }
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const response = await fetch(apiBaseUrl, { headers });
-      if (!response.ok) {
-         if (response.status === 401) {
-          throw new Error('Your session has expired. Please log in again.');
-        }
-        throw new Error('Failed to fetch products. The server might be down or experiencing issues.');
-      }
-      const data = await response.json();
-      setProducts(data);
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error Fetching Products',
-        description: error.message || 'An unknown error occurred.',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast, getAuthHeaders]);
+    },
+    [toast, getAuthHeaders]
+  );
 
   useEffect(() => {
     fetchProducts();
@@ -114,19 +121,23 @@ export default function ProductList() {
     setIsFormOpen(true);
   };
 
-  const handleFormSubmit = async (values: z.infer<typeof productFormSchema>) => {
+  const handleFormSubmit = async (
+    values: z.infer<typeof productFormSchema>
+  ) => {
     setFormLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-        setFormLoading(false);
-        return;
+      setFormLoading(false);
+      return;
     }
 
     const isEditing = !!selectedProduct;
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/${selectedProduct.id}` : apiBaseUrl;
-    
-    const body = JSON.stringify(isEditing ? { ...values, id: selectedProduct.id } : values);
+
+    const body = JSON.stringify(
+      isEditing ? { ...values, id: selectedProduct.id } : values
+    );
 
     try {
       const response = await fetch(url, {
@@ -137,12 +148,19 @@ export default function ProductList() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(errorData || `Server error: Failed to ${isEditing ? 'update' : 'create'} product.`);
+        throw new Error(
+          errorData ||
+            `Server error: Failed to ${
+              isEditing ? 'update' : 'create'
+            } product.`
+        );
       }
-      
+
       toast({
         title: 'Success',
-        description: `Product successfully ${isEditing ? 'updated' : 'created'}.`,
+        description: `Product successfully ${
+          isEditing ? 'updated' : 'created'
+        }.`,
       });
 
       setIsFormOpen(false);
@@ -158,12 +176,14 @@ export default function ProductList() {
     }
   };
 
-
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Product Management</h1>
-        <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+        <Button
+          onClick={handleAddClick}
+          className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
+        >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Product
         </Button>
       </div>
@@ -183,48 +203,80 @@ export default function ProductList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[50px] hidden sm:table-cell">ID</TableHead>
+                    <TableHead className="w-[50px] hidden sm:table-cell">
+                      ID
+                    </TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden lg:table-cell">Description</TableHead>
-                    <TableHead>Price</TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Description
+                    </TableHead>
+                    <TableHead>Sell Price</TableHead>
+                    <TableHead className="hidden md:table-cell">Buy Price</TableHead>
                     <TableHead className="hidden md:table-cell">SKU</TableHead>
-                    <TableHead className="hidden sm:table-cell">Quantity</TableHead>
-                    <TableHead className="hidden lg:table-cell">Reorder Level</TableHead>
-                    <TableHead className="w-[100px] text-right">Actions</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Stock
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Reorder
+                    </TableHead>
+                    <TableHead className="w-[100px] text-right">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.length > 0 ? products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="hidden sm:table-cell">{product.id}</TableCell>
-                      <TableCell className="font-medium">{product.productName}</TableCell>
-                      <TableCell className="hidden lg:table-cell max-w-[250px] truncate">{product.description}</TableCell>
-                      <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
-                      <TableCell className="hidden md:table-cell">{product.sku}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{product.quantityPerUnit}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{product.reoredLevel}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditClick(product)}>
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  )) : (
+                  {products.length > 0 ? (
+                    products.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell className="hidden sm:table-cell">
+                          {product.id}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {product.productName}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell max-w-[250px] truncate">
+                          {product.description}
+                        </TableCell>
+                        <TableCell>
+                          Rs. {product.pricePerUnit.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          Rs. {product.pricePerUnitPurchased.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {product.sku}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          {product.stockQuantity}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {product.reoredLevel}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleEditClick(product)}
+                              >
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center h-24">
+                      <TableCell colSpan={9} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>
@@ -235,7 +287,7 @@ export default function ProductList() {
           )}
         </CardContent>
       </Card>
-      
+
       <ProductForm
         isOpen={isFormOpen}
         setIsOpen={setIsFormOpen}

@@ -115,7 +115,7 @@ export default function ProductList() {
                 products.slice(0, 5).map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.productName}</TableCell>
-                    <TableCell className="hidden md:table-cell">{product.quantityPerUnit}</TableCell>
+                    <TableCell className="hidden md:table-cell">{product.stockQuantity}</TableCell>
                     <TableCell className="hidden sm:table-cell">
                       Rs. {product.pricePerUnit.toFixed(2)}
                     </TableCell>
@@ -123,11 +123,11 @@ export default function ProductList() {
                       <Badge
                         className={cn(
                           'capitalize',
-                          getBadgeClassName(parseInt(product.quantityPerUnit, 10), product.reoredLevel)
+                          getBadgeClassName(product.stockQuantity, product.reoredLevel)
                         )}
                         variant="secondary"
                       >
-                        {getStatus(parseInt(product.quantityPerUnit, 10), product.reoredLevel)}
+                        {getStatus(product.stockQuantity, product.reoredLevel)}
                       </Badge>
                     </TableCell>
                   </TableRow>
