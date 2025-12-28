@@ -24,8 +24,16 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { type Product } from '@/lib/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { type Product, type Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   productName: z.string().min(2, 'Product name must be at least 2 characters.'),
@@ -35,9 +43,14 @@ const formSchema = z.object({
   sku: z.string().min(1, 'SKU is required.'),
   stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a positive integer.'),
   reoredLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer.'),
-  categoryId: z.coerce.number().int().min(1, 'Category ID is required.'),
+  categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
 });
+
+type CategoryDropdownItem = {
+  id: number;
+  name: string;
+};
 
 type ProductFormProps = {
   isOpen: boolean;
@@ -54,6 +67,9 @@ export default function ProductForm({
   product,
   loading,
 }: ProductFormProps) {
+  const [categories, setCategories] = React.useState<CategoryDropdownItem[]>([]);
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,20 +86,40 @@ export default function ProductForm({
   });
 
   React.useEffect(() => {
-    if (isOpen) {
-        form.reset({
-          productName: product?.productName || '',
-          description: product?.description || '',
-          pricePerUnitPurchased: product?.pricePerUnitPurchased || 0,
-          pricePerUnit: product?.pricePerUnit || 0,
-          sku: product?.sku || '',
-          stockQuantity: product?.stockQuantity || 0,
-          reoredLevel: product?.reoredLevel || 0,
-          categoryId: product?.categoryId || 0,
-          supplierId: product?.supplierId || 0,
+    async function fetchCategories() {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'Please log in again.' });
+        return;
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Category/Categorydropdown`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
+        if (!response.ok) throw new Error('Failed to fetch categories');
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not load categories.' });
+      }
     }
-  }, [product, form, isOpen]);
+
+    if (isOpen) {
+      fetchCategories();
+      form.reset({
+        productName: product?.productName || '',
+        description: product?.description || '',
+        pricePerUnitPurchased: product?.pricePerUnitPurchased || 0,
+        pricePerUnit: product?.pricePerUnit || 0,
+        sku: product?.sku || '',
+        stockQuantity: product?.stockQuantity || 0,
+        reoredLevel: product?.reoredLevel || 0,
+        categoryId: product?.categoryId || 0,
+        supplierId: product?.supplierId || 0,
+      });
+    }
+  }, [product, form, isOpen, toast]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -106,7 +142,7 @@ export default function ProductForm({
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
               control={form.control}
               name="sku"
               render={({ field }) => (
@@ -119,23 +155,20 @@ export default function ProductForm({
                 </FormItem>
               )}
             />
-             <div className="md:col-span-2">
-                <FormField
+            <div className="md:col-span-2">
+              <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                        <Textarea
-                        placeholder="A brief description of the product."
-                        {...field}
-                        />
+                      <Textarea placeholder="A brief description of the product." {...field} />
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
             </div>
             <FormField
               control={form.control}
@@ -194,15 +227,30 @@ export default function ProductForm({
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category ID</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 1" {...field} />
-                  </FormControl>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                    defaultValue={field.value > 0 ? String(field.value) : undefined}
+                    value={field.value > 0 ? String(field.value) : undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={String(category.id)}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
               control={form.control}
               name="supplierId"
               render={({ field }) => (
@@ -215,7 +263,7 @@ export default function ProductForm({
                 </FormItem>
               )}
             />
-            
+
             <DialogFooter className="md:col-span-2 mt-4">
               <DialogClose asChild>
                 <Button type="button" variant="secondary" disabled={loading}>
