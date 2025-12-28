@@ -31,18 +31,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { type Product, type Category } from '@/lib/types';
+import { type Product } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   productName: z.string().min(2, 'Product name must be at least 2 characters.'),
   description: z.string().min(5, 'Description must be at least 5 characters.'),
-  pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase price must be a positive number.'),
   pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number.'),
   sku: z.string().min(1, 'SKU is required.'),
-  stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a positive integer.'),
-  reorderLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer.'),
+  quantityPerUnit: z.string().min(1, 'Quantity per unit is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
 });
@@ -75,11 +73,9 @@ export default function ProductForm({
     defaultValues: {
       productName: '',
       description: '',
-      pricePerUnitPurchased: 0,
       pricePerUnit: 0,
       sku: '',
-      stockQuantity: 0,
-      reorderLevel: 0,
+      quantityPerUnit: '',
       categoryId: 0,
       supplierId: 0,
     },
@@ -110,11 +106,9 @@ export default function ProductForm({
       form.reset({
         productName: product?.productName || '',
         description: product?.description || '',
-        pricePerUnitPurchased: product?.pricePerUnitPurchased || 0,
         pricePerUnit: product?.pricePerUnit || 0,
         sku: product?.sku || '',
-        stockQuantity: product?.stockQuantity || 0,
-        reorderLevel: product?.reorderLevel || 0,
+        quantityPerUnit: product?.quantityPerUnit || '',
         categoryId: product?.categoryId || 0,
         supplierId: product?.supplierId || 0,
       });
@@ -172,19 +166,6 @@ export default function ProductForm({
             </div>
             <FormField
               control={form.control}
-              name="pricePerUnitPurchased"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Purchase Price Per Unit</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 80" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="pricePerUnit"
               render={({ field }) => (
                 <FormItem>
@@ -198,25 +179,12 @@ export default function ProductForm({
             />
             <FormField
               control={form.control}
-              name="stockQuantity"
+              name="quantityPerUnit"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stock Quantity</FormLabel>
+                  <FormLabel>Quantity Per Unit</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g., 100" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="reorderLevel"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reorder Level</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 5" {...field} />
+                    <Input placeholder="e.g., 1 kg" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

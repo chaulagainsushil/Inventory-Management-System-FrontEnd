@@ -2,33 +2,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { type Product } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
 const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Product`;
-
-const getBadgeClassName = (quantity: number, reorderLevel: number) => {
-  if (quantity === 0) {
-    return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
-  }
-  if (quantity <= reorderLevel) {
-    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
-  }
-  return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
-};
-
-const getStatus = (quantity: number, reorderLevel: number) => {
-    if (quantity === 0) return 'Out of Stock';
-    if (quantity <= reorderLevel) return 'Low Stock';
-    return 'In Stock';
-}
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -106,9 +87,8 @@ export default function ProductList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Product Name</TableHead>
-                <TableHead className="hidden md:table-cell">Stock</TableHead>
                 <TableHead className="hidden sm:table-cell">Price</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Qty Per Unit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -116,26 +96,17 @@ export default function ProductList() {
                 products.slice(0, 5).map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.productName}</TableCell>
-                    <TableCell className="hidden md:table-cell">{product.stockQuantity}</TableCell>
                     <TableCell className="hidden sm:table-cell">
                       Rs. {product.pricePerUnit.toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        className={cn(
-                          'capitalize',
-                          getBadgeClassName(product.stockQuantity, product.reorderLevel)
-                        )}
-                        variant="secondary"
-                      >
-                        {getStatus(product.stockQuantity, product.reorderLevel)}
-                      </Badge>
+                      {product.quantityPerUnit}
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center h-24">
+                  <TableCell colSpan={3} className="text-center h-24">
                     No products found.
                   </TableCell>
                 </TableRow>

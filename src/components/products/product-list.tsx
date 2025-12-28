@@ -35,11 +35,9 @@ const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 const productFormSchema = z.object({
   productName: z.string().min(2, 'Product name is too short'),
   description: z.string().min(5, 'Description is too short'),
-  pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase Price must be a positive number.'),
   pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
   sku: z.string().min(1, 'SKU is required'),
-  stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a positive integer.'),
-  reorderLevel: z.coerce.number().int().min(0, 'Reorder level must be a positive integer'),
+  quantityPerUnit: z.string().min(1, 'Quantity per unit is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
 });
@@ -203,11 +201,9 @@ export default function ProductList() {
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead className="hidden lg:table-cell">Description</TableHead>
-                    <TableHead>Sell Price</TableHead>
-                    <TableHead className="hidden md:table-cell">Buy Price</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="hidden md:table-cell">Qty Per Unit</TableHead>
                     <TableHead className="hidden md:table-cell">SKU</TableHead>
-                    <TableHead className="hidden sm:table-cell">Stock</TableHead>
-                    <TableHead className="hidden lg:table-cell">Reorder</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -220,10 +216,8 @@ export default function ProductList() {
                         <TableCell>{categories.get(product.categoryId) || 'N/A'}</TableCell>
                         <TableCell className="hidden lg:table-cell max-w-[250px] truncate">{product.description}</TableCell>
                         <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
-                        <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
+                        <TableCell className="hidden md:table-cell">{product.quantityPerUnit}</TableCell>
                         <TableCell className="hidden md:table-cell">{product.sku}</TableCell>
-                        <TableCell className="hidden sm:table-cell">{product.stockQuantity}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{product.reorderLevel}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -246,7 +240,7 @@ export default function ProductList() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center h-24">
+                      <TableCell colSpan={8} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>

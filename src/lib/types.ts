@@ -20,11 +20,9 @@ export type Product = {
   supplierId: number;
   productName: string;
   description: string;
-  pricePerUnitPurchased: number;
   pricePerUnit: number;
   sku: string;
-  stockQuantity: number;
-  reorderLevel: number;
+  quantityPerUnit: string;
 };
 
 export type User = {
