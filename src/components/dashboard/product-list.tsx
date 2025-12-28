@@ -26,6 +26,12 @@ export default function ProductList() {
     };
   }, []);
 
+  const getStatus = (stock: number, reorderLevel: number) => {
+    if (stock === 0) return <Badge variant="destructive">Out of Stock</Badge>;
+    if (stock <= reorderLevel) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
+    return <Badge className="bg-green-500">In Stock</Badge>;
+  };
+
   const fetchProducts = useCallback(
     async (retries = 3) => {
       const headers = getAuthHeaders();
@@ -88,6 +94,8 @@ export default function ProductList() {
               <TableRow>
                 <TableHead>Product Name</TableHead>
                 <TableHead className="hidden sm:table-cell">Price</TableHead>
+                <TableHead className="hidden md:table-cell">Stock</TableHead>
+                <TableHead className="text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -98,11 +106,15 @@ export default function ProductList() {
                     <TableCell className="hidden sm:table-cell">
                       Rs. {product.pricePerUnit.toFixed(2)}
                     </TableCell>
+                    <TableCell className="hidden md:table-cell">{product.stockQuantity}</TableCell>
+                    <TableCell className="text-right">
+                        {getStatus(product.stockQuantity, product.reorderLevel)}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center h-24">
+                  <TableCell colSpan={4} className="text-center h-24">
                     No products found.
                   </TableCell>
                 </TableRow>

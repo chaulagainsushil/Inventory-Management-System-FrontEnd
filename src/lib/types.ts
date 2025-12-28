@@ -21,6 +21,9 @@ export type Product = {
   productName: string;
   description: string;
   pricePerUnit: number;
+  pricePerUnitPurchased: number;
+  stockQuantity: number;
+  reorderLevel: number;
   sku: string;
 };
 

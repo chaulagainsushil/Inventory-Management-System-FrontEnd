@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type Product, type Category } from '@/lib/types';
@@ -35,7 +36,10 @@ const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 const productFormSchema = z.object({
   productName: z.string().min(2, 'Product name is too short'),
   description: z.string().min(5, 'Description is too short'),
-  pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
+  pricePerUnit: z.coerce.number().min(0, 'Selling price must be a positive number'),
+  pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase price must be a positive number'),
+  stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a whole number.'),
+  reorderLevel: z.coerce.number().int().min(0, 'Reorder level must be a whole number.'),
   sku: z.string().min(1, 'SKU is required'),
   categoryId: z.coerce.number().int().min(1, 'Category is required'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
@@ -172,6 +176,12 @@ export default function ProductList() {
     }
   };
 
+  const getStatus = (stock: number, reorderLevel: number) => {
+    if (stock === 0) return <Badge variant="destructive">Out of Stock</Badge>;
+    if (stock <= reorderLevel) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
+    return <Badge className="bg-green-500">In Stock</Badge>;
+  };
+
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
@@ -199,9 +209,13 @@ export default function ProductList() {
                     <TableHead className="w-[50px] hidden sm:table-cell">ID</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead className="hidden lg:table-cell">Description</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="hidden md:table-cell">SKU</TableHead>
+                    <TableHead className="hidden xl:table-cell">Description</TableHead>
+                    <TableHead>Sell Price</TableHead>
+                    <TableHead className="hidden md:table-cell">Buy Price</TableHead>
+                    <TableHead className="hidden lg:table-cell">SKU</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead className="hidden lg:table-cell">Reorder</TableHead>
+                    <TableHead className="hidden sm:table-cell">Status</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -212,9 +226,13 @@ export default function ProductList() {
                         <TableCell className="hidden sm:table-cell">{product.id}</TableCell>
                         <TableCell className="font-medium">{product.productName}</TableCell>
                         <TableCell>{categories.get(product.categoryId) || 'N/A'}</TableCell>
-                        <TableCell className="hidden lg:table-cell max-w-[250px] truncate">{product.description}</TableCell>
+                        <TableCell className="hidden xl:table-cell max-w-[250px] truncate">{product.description}</TableCell>
                         <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
-                        <TableCell className="hidden md:table-cell">{product.sku}</TableCell>
+                        <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
+                        <TableCell className="hidden lg:table-cell">{product.sku}</TableCell>
+                        <TableCell>{product.stockQuantity}</TableCell>
+                        <TableCell className="hidden lg:table-cell">{product.reorderLevel}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{getStatus(product.stockQuantity, product.reorderLevel)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -237,7 +255,7 @@ export default function ProductList() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center h-24">
+                      <TableCell colSpan={11} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>

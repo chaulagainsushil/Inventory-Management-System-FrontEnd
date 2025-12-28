@@ -38,7 +38,10 @@ import { useToast } from '@/hooks/use-toast';
 const formSchema = z.object({
   productName: z.string().min(2, 'Product name must be at least 2 characters.'),
   description: z.string().min(5, 'Description must be at least 5 characters.'),
-  pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number.'),
+  pricePerUnit: z.coerce.number().min(0, 'Selling price must be a positive number.'),
+  pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase price must be a positive number.'),
+  stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a whole number.'),
+  reorderLevel: z.coerce.number().int().min(0, 'Reorder level must be a whole number.'),
   sku: z.string().min(1, 'SKU is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
@@ -73,6 +76,9 @@ export default function ProductForm({
       productName: '',
       description: '',
       pricePerUnit: 0,
+      pricePerUnitPurchased: 0,
+      stockQuantity: 0,
+      reorderLevel: 0,
       sku: '',
       categoryId: 0,
       supplierId: 0,
@@ -105,6 +111,9 @@ export default function ProductForm({
         productName: product?.productName || '',
         description: product?.description || '',
         pricePerUnit: product?.pricePerUnit || 0,
+        pricePerUnitPurchased: product?.pricePerUnitPurchased || 0,
+        stockQuantity: product?.stockQuantity || 0,
+        reorderLevel: product?.reorderLevel || 0,
         sku: product?.sku || '',
         categoryId: product?.categoryId || 0,
         supplierId: product?.supplierId || 0,
@@ -169,6 +178,45 @@ export default function ProductForm({
                   <FormLabel>Selling Price Per Unit</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 100" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="pricePerUnitPurchased"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Purchase Price Per Unit</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 80" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="stockQuantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stock Quantity</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 100" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="reorderLevel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Reorder Level</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 20" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
