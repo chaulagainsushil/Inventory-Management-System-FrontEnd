@@ -10,11 +10,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Smartphone, ShieldCheck, Warehouse } from 'lucide-react';
+import { Loader2, Smartphone, ShieldCheck, Warehouse, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -146,14 +147,29 @@ export default function LoginPage() {
                       Forgot your password?
                     </Link>
                   </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={loading}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember-me" disabled={loading} />
