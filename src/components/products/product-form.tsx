@@ -40,7 +40,6 @@ const formSchema = z.object({
   description: z.string().min(5, 'Description must be at least 5 characters.'),
   pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number.'),
   sku: z.string().min(1, 'SKU is required.'),
-  quantityPerUnit: z.string().min(1, 'Quantity per unit is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
 });
@@ -75,7 +74,6 @@ export default function ProductForm({
       description: '',
       pricePerUnit: 0,
       sku: '',
-      quantityPerUnit: '',
       categoryId: 0,
       supplierId: 0,
     },
@@ -108,7 +106,6 @@ export default function ProductForm({
         description: product?.description || '',
         pricePerUnit: product?.pricePerUnit || 0,
         sku: product?.sku || '',
-        quantityPerUnit: product?.quantityPerUnit || '',
         categoryId: product?.categoryId || 0,
         supplierId: product?.supplierId || 0,
       });
@@ -172,19 +169,6 @@ export default function ProductForm({
                   <FormLabel>Selling Price Per Unit</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 100" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quantityPerUnit"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity Per Unit</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 1 kg" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

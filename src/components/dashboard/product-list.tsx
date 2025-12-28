@@ -88,7 +88,6 @@ export default function ProductList() {
               <TableRow>
                 <TableHead>Product Name</TableHead>
                 <TableHead className="hidden sm:table-cell">Price</TableHead>
-                <TableHead>Qty Per Unit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -99,14 +98,11 @@ export default function ProductList() {
                     <TableCell className="hidden sm:table-cell">
                       Rs. {product.pricePerUnit.toFixed(2)}
                     </TableCell>
-                    <TableCell>
-                      {product.quantityPerUnit}
-                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center h-24">
+                  <TableCell colSpan={2} className="text-center h-24">
                     No products found.
                   </TableCell>
                 </TableRow>

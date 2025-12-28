@@ -37,7 +37,6 @@ const productFormSchema = z.object({
   description: z.string().min(5, 'Description is too short'),
   pricePerUnit: z.coerce.number().min(0, 'Price must be a positive number'),
   sku: z.string().min(1, 'SKU is required'),
-  quantityPerUnit: z.string().min(1, 'Quantity per unit is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
 });
@@ -202,7 +201,6 @@ export default function ProductList() {
                     <TableHead>Category</TableHead>
                     <TableHead className="hidden lg:table-cell">Description</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead className="hidden md:table-cell">Qty Per Unit</TableHead>
                     <TableHead className="hidden md:table-cell">SKU</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
@@ -216,7 +214,6 @@ export default function ProductList() {
                         <TableCell>{categories.get(product.categoryId) || 'N/A'}</TableCell>
                         <TableCell className="hidden lg:table-cell max-w-[250px] truncate">{product.description}</TableCell>
                         <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
-                        <TableCell className="hidden md:table-cell">{product.quantityPerUnit}</TableCell>
                         <TableCell className="hidden md:table-cell">{product.sku}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -240,7 +237,7 @@ export default function ProductList() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center h-24">
+                      <TableCell colSpan={7} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>

@@ -22,7 +22,6 @@ export type Product = {
   description: string;
   pricePerUnit: number;
   sku: string;
-  quantityPerUnit: string;
 };
 
 export type User = {
