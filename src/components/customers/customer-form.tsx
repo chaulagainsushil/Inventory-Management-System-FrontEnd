@@ -67,12 +67,21 @@ export default function CustomerForm({
 
   React.useEffect(() => {
     if (isOpen) {
+      if (customer) {
         form.reset({
-          customerName: customer?.customerName || '',
-          phoneNumber: customer?.phoneNumber || '',
-          email: customer?.email || '',
-          address: customer?.address || '',
+          customerName: customer.customerName || '',
+          phoneNumber: customer.phoneNumber || '',
+          email: customer.email || '',
+          address: customer.address || '',
         });
+      } else {
+        form.reset({
+          customerName: '',
+          phoneNumber: '',
+          email: '',
+          address: '',
+        });
+      }
     }
   }, [customer, form, isOpen]);
 
