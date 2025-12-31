@@ -34,3 +34,11 @@ export type User = {
   userName: string;
   roles: string[];
 };
+
+export type Customer = {
+  id: number;
+  customerName: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+};
