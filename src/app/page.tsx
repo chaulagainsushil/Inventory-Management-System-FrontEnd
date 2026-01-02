@@ -72,7 +72,7 @@ export default function LoginPage() {
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
       <div className="hidden bg-primary text-primary-foreground lg:flex flex-col items-center justify-center p-12 text-center">
         <div className="max-w-md">
-          <h2 className="text-4xl font-bold font-headline mb-4">Streamline Your Inventory</h2>
+          <h2 className="text-4xl font-bold font-headline mb-4">Automate Your Inventory</h2>
           <p className="text-lg opacity-90 mb-8">
             StockSync is a powerful, intuitive inventory management system designed to give you complete control over your stock, from procurement to sales.
           </p>

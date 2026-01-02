@@ -26,9 +26,9 @@ export default function ProductList() {
     };
   }, []);
 
-  const getStatus = (stock: number, reorderLevel: number) => {
+  const getStatus = (stock: number, safetyStock: number) => {
     if (stock === 0) return <Badge variant="destructive">Out of Stock</Badge>;
-    if (stock <= reorderLevel) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
+    if (stock <= safetyStock) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
     return <Badge className="bg-green-500">In Stock</Badge>;
   };
 
@@ -108,7 +108,7 @@ export default function ProductList() {
                     </TableCell>
                     <TableCell className="hidden md:table-cell">{product.stockQuantity}</TableCell>
                     <TableCell className="text-right">
-                        {getStatus(product.stockQuantity, product.reorderLevel)}
+                        {getStatus(product.stockQuantity, product.safetyStock)}
                     </TableCell>
                   </TableRow>
                 ))
