@@ -23,8 +23,6 @@ export type Product = {
   pricePerUnit: number;
   pricePerUnitPurchased: number;
   stockQuantity: number;
-  safetyStock: number;
-  leadTimeDays: number;
   sku: string;
 };
 

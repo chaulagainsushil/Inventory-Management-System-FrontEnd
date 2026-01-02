@@ -41,8 +41,6 @@ const formSchema = z.object({
   pricePerUnit: z.coerce.number().min(0, 'Selling price must be a positive number.'),
   pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase price must be a positive number.'),
   stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a whole number.'),
-  safetyStock: z.coerce.number().int().min(0, 'Safety stock must be a whole number.'),
-  leadTimeDays: z.coerce.number().int().min(0, 'Lead time must be a positive whole number.'),
   sku: z.string().min(1, 'SKU is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
@@ -79,8 +77,6 @@ export default function ProductForm({
       pricePerUnit: 0,
       pricePerUnitPurchased: 0,
       stockQuantity: 0,
-      safetyStock: 0,
-      leadTimeDays: 0,
       sku: '',
       categoryId: 0,
       supplierId: 0,
@@ -115,8 +111,6 @@ export default function ProductForm({
         pricePerUnit: product?.pricePerUnit || 0,
         pricePerUnitPurchased: product?.pricePerUnitPurchased || 0,
         stockQuantity: product?.stockQuantity || 0,
-        safetyStock: product?.safetyStock || 0,
-        leadTimeDays: product?.leadTimeDays || 0,
         sku: product?.sku || '',
         categoryId: product?.categoryId || 0,
         supplierId: product?.supplierId || 0,
@@ -207,32 +201,6 @@ export default function ProductForm({
                   <FormLabel>Stock Quantity</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 100" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="safetyStock"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Safety Stock</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 10" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="leadTimeDays"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Lead Time (Days)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 7" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

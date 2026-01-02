@@ -39,8 +39,6 @@ const productFormSchema = z.object({
   pricePerUnit: z.coerce.number().min(0, 'Selling price must be a positive number.'),
   pricePerUnitPurchased: z.coerce.number().min(0, 'Purchase price must be a positive number.'),
   stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a whole number.'),
-  safetyStock: z.coerce.number().int().min(0, 'Safety stock must be a whole number.'),
-  leadTimeDays: z.coerce.number().int().min(0, 'Lead time must be a positive whole number.'),
   sku: z.string().min(1, 'SKU is required'),
   categoryId: z.coerce.number().int().min(1, 'Category is required'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
@@ -183,9 +181,9 @@ export default function ProductList() {
     }
   };
 
-  const getStatus = (stock: number, safetyStock: number) => {
+  const getStatus = (stock: number) => {
     if (stock === 0) return <Badge variant="destructive">Out of Stock</Badge>;
-    if (stock <= safetyStock) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
+    if (stock > 0 && stock <= 10) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
     return <Badge className="bg-green-500">In Stock</Badge>;
   };
 
@@ -221,8 +219,6 @@ export default function ProductList() {
                     <TableHead className="hidden md:table-cell">Buy Price</TableHead>
                     <TableHead className="hidden lg:table-cell">SKU</TableHead>
                     <TableHead>Stock</TableHead>
-                    <TableHead className="hidden lg:table-cell">Safety Stock</TableHead>
-                    <TableHead className="hidden lg:table-cell">Lead Time</TableHead>
                     <TableHead className="hidden sm:table-cell">Status</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
@@ -239,9 +235,7 @@ export default function ProductList() {
                         <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
                         <TableCell className="hidden lg:table-cell">{product.sku}</TableCell>
                         <TableCell>{product.stockQuantity}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{product.safetyStock}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{product.leadTimeDays} days</TableCell>
-                        <TableCell className="hidden sm:table-cell">{getStatus(product.stockQuantity, product.safetyStock)}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{getStatus(product.stockQuantity)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -264,7 +258,7 @@ export default function ProductList() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={12} className="text-center h-24">
+                      <TableCell colSpan={10} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>
