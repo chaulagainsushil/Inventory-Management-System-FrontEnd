@@ -42,6 +42,7 @@ const productFormSchema = z.object({
   sku: z.string().min(1, 'SKU is required'),
   categoryId: z.coerce.number().int().min(1, 'Category is required'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required'),
+  leadTimeDays: z.coerce.number().int().min(0, 'Lead time must be a positive number.').optional(),
 });
 
 
@@ -219,6 +220,7 @@ export default function ProductList() {
                     <TableHead className="hidden md:table-cell">Buy Price</TableHead>
                     <TableHead className="hidden lg:table-cell">SKU</TableHead>
                     <TableHead>Stock</TableHead>
+                    <TableHead>Lead Time</TableHead>
                     <TableHead className="hidden sm:table-cell">Status</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
@@ -235,6 +237,7 @@ export default function ProductList() {
                         <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
                         <TableCell className="hidden lg:table-cell">{product.sku}</TableCell>
                         <TableCell>{product.stockQuantity}</TableCell>
+                        <TableCell>{product.leadTimeDays ? `${product.leadTimeDays} days` : 'N/A'}</TableCell>
                         <TableCell className="hidden sm:table-cell">{getStatus(product.stockQuantity)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -258,7 +261,7 @@ export default function ProductList() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center h-24">
+                      <TableCell colSpan={11} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>

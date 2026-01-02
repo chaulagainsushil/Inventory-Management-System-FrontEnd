@@ -44,6 +44,7 @@ const formSchema = z.object({
   sku: z.string().min(1, 'SKU is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
   supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
+  leadTimeDays: z.coerce.number().int().min(0, 'Lead time must be a positive number.').optional(),
 });
 
 type CategoryDropdownItem = {
@@ -80,6 +81,7 @@ export default function ProductForm({
       sku: '',
       categoryId: 0,
       supplierId: 0,
+      leadTimeDays: 0,
     },
   });
 
@@ -114,6 +116,7 @@ export default function ProductForm({
         sku: product?.sku || '',
         categoryId: product?.categoryId || 0,
         supplierId: product?.supplierId || 0,
+        leadTimeDays: product?.leadTimeDays || 0,
       });
     }
   }, [product, form, isOpen, toast]);
@@ -247,6 +250,19 @@ export default function ProductForm({
                 </FormItem>
               )}
             />
+            <FormField
+                control={form.control}
+                name="leadTimeDays"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lead Time (Days)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="e.g., 7" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <DialogFooter className="md:col-span-2 mt-4">
               <DialogClose asChild>

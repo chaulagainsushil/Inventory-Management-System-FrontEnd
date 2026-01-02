@@ -24,6 +24,7 @@ export type Product = {
   pricePerUnitPurchased: number;
   stockQuantity: number;
   sku: string;
+  leadTimeDays?: number;
 };
 
 export type User = {
