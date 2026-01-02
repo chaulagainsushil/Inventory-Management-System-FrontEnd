@@ -104,7 +104,12 @@ export default function ProductList() {
         
         const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat.name]));
 
-        setProducts(productsData);
+        const mappedProducts = productsData.map((p: any) => ({
+          ...p,
+          supplierId: p.suppliersInfromationId || p.supplierId,
+        }));
+
+        setProducts(mappedProducts);
         setCategories(categoryMap);
 
       } catch (error: any) {
