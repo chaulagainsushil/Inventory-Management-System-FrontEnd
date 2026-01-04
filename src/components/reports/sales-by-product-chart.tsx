@@ -138,10 +138,13 @@ export default function SalesByProductChart() {
                   content={<ChartTooltipContent hideLabel formatter={(value, name, props) => {
                     const { payload } = props;
                     return (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 p-1">
                             <span className="font-bold">{payload.productName}</span>
-                            <span>Sales: {payload.totalSalesAmount.toFixed(2)}</span>
-                            <span>Percentage: {`${value.toFixed(2)}%`}</span>
+                            <div className='text-sm'>
+                              <p>Total Sales: Rs. {payload.totalSalesAmount.toFixed(2)}</p>
+                              <p>Quantity Sold: {payload.totalQuantitySold}</p>
+                              <p>Sales Percentage: {`${value.toFixed(2)}%`}</p>
+                            </div>
                         </div>
                     )
                   }} />}
