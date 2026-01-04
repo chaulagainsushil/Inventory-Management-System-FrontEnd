@@ -39,8 +39,8 @@ export default function InventoryMovementChart() {
                 <YAxis tickLine={false} axisLine={false} tickMargin={8} />
                 <Tooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Line type="monotone" dataKey="stockIn" stroke={chartConfig.stockIn.color} strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="stockOut" stroke={chartConfig.stockOut.color} strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" strokeWidth={2.5} dot={false} />
             </LineChart>
         </ChartContainer>
       </CardContent>
