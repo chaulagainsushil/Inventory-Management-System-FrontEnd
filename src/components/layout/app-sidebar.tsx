@@ -14,7 +14,6 @@ import {
   LayoutGrid,
   Truck,
   FileStack,
-  ArrowRightLeft,
   BarChart as BarChartIcon,
   Settings,
   LogOut,
@@ -44,6 +43,7 @@ export default function AppSidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     router.push('/');
   };
 

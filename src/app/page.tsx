@@ -35,8 +35,9 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.token) {
+        if (data.token && data.user) {
           localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
           toast({
             title: 'Login Successful',
             description: 'Redirecting to your dashboard...',
@@ -46,7 +47,7 @@ export default function LoginPage() {
           toast({
             variant: 'destructive',
             title: 'Login Failed',
-            description: 'Authentication token was not provided by the server.',
+            description: 'Authentication token or user data was not provided by the server.',
           });
         }
       } else {
