@@ -10,10 +10,19 @@ export default function MonthlyRevenueStat() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchMonthlyRevenue = async () => {
+    const fetchMonthlyRevenue = async (retries = 3) => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
       const token = localStorage.getItem('authToken');
+
       if (!token) {
-        setRevenue('N/A');
+        if (retries > 0) {
+          setTimeout(() => fetchMonthlyRevenue(retries - 1), 500);
+        } else {
+          setRevenue('N/A');
+        }
         return;
       }
   
@@ -37,9 +46,9 @@ export default function MonthlyRevenueStat() {
         const data = await response.json();
   
         const revenueValue =
-          typeof data === 'number'
-            ? data
-            : Number(data.totalRevenue);
+          typeof data.revenue === 'number'
+            ? data.revenue
+            : Number(data.revenue);
   
         setRevenue(revenueValue.toFixed(2));
       } catch (error: any) {
