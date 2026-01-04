@@ -33,7 +33,6 @@ const navItems = [
   { href: '/customers', icon: Users, label: 'Customers' },
   { href: '/stock-alerts', icon: AlertTriangle, label: 'Stock Alerts' },
   { href: '#', icon: FileStack, label: 'Purchase Record' },
-  { href: '#', icon: ArrowRightLeft, label: 'Sales / Issue Goods' },
   { href: '#', icon: BarChartIcon, label: 'Reports' },
   { href: '/users', icon: UserPlus, label: 'Create User' },
   { href: '#', icon: Settings, label: 'Settings' },
