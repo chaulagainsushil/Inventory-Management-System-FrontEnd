@@ -114,6 +114,13 @@ export default function ProductsByCategoryChart() {
     return config;
   }, [chartData])
 
+  const legendPayload = chartData.map((item, index) => ({
+    value: item.categoryName,
+    type: 'square',
+    color: CHART_COLORS[index % CHART_COLORS.length],
+  }));
+
+
   return (
     <Card>
       <CardHeader>
@@ -135,6 +142,10 @@ export default function ProductsByCategoryChart() {
                   axisLine={false}
                   tickMargin={8}
                   tickFormatter={(value) => value.slice(0, 10)}
+                  height={60}
+                  interval={0}
+                  angle={-45}
+                  textAnchor="end"
                 />
                 <YAxis dataKey="productCount" />
                 <Tooltip
@@ -159,6 +170,7 @@ export default function ProductsByCategoryChart() {
                         <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                     ))}
                 </Bar>
+                <Legend content={<CustomLegend payload={legendPayload} />} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -171,3 +183,16 @@ export default function ProductsByCategoryChart() {
     </Card>
   );
 }
+
+const CustomLegend = ({ payload }: any) => {
+  return (
+    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+      {payload.map((entry: any, index: number) => (
+        <div key={`item-${index}`} className="flex items-center space-x-2">
+          <span style={{ backgroundColor: entry.color, width: '12px', height: '12px', display: 'inline-block', borderRadius: '2px' }}></span>
+          <span className="text-xs text-muted-foreground">{entry.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
