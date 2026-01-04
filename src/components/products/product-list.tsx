@@ -221,7 +221,6 @@ export default function ProductList() {
                     <TableHead className="hidden lg:table-cell">SKU</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Lead Time</TableHead>
-                    <TableHead className="hidden sm:table-cell">Status</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -238,7 +237,6 @@ export default function ProductList() {
                         <TableCell className="hidden lg:table-cell">{product.sku}</TableCell>
                         <TableCell>{product.stockQuantity}</TableCell>
                         <TableCell>{product.leadTimeDays ? `${product.leadTimeDays} days` : 'N/A'}</TableCell>
-                        <TableCell className="hidden sm:table-cell">{getStatus(product.stockQuantity)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
