@@ -20,6 +20,7 @@ import {
   LogOut,
   UserPlus,
   Users,
+  AlertTriangle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/categories', icon: LayoutGrid, label: 'Categories' },
   { href: '/suppliers', icon: Truck, label: 'Suppliers' },
   { href: '/customers', icon: Users, label: 'Customers' },
+  { href: '/stock-alerts', icon: AlertTriangle, label: 'Stock Alerts' },
   { href: '#', icon: FileStack, label: 'Purchase Orders' },
   { href: '#', icon: ArrowRightLeft, label: 'Sales / Issue Goods' },
   { href: '#', icon: BarChartIcon, label: 'Reports' },

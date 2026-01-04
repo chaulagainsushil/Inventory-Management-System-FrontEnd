@@ -42,3 +42,15 @@ export type Customer = {
   email: string;
   address: string;
 };
+
+export type StockAlert = {
+  productId: number;
+  productName: string;
+  currentStock: number;
+  reorderPoint: number;
+  averageDailySales: number;
+  leadTimeDays: number;
+  safetyStock: number;
+  suggestedOrderQty: number;
+  urgencyLevel: string;
+}

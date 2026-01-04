@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import StatCard from '@/components/dashboard/stat-card';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
+import { Card } from '@/components/ui/card';
 
 export default function StockAlertStat() {
   const [count, setCount] = useState('...');
@@ -57,5 +59,9 @@ export default function StockAlertStat() {
 
   }, [toast]);
 
-  return <StatCard title="Stock Alerts" value={count} icon={AlertTriangle} variant="destructive" />;
+  return (
+    <Link href="/stock-alerts" className="hover:cursor-pointer">
+      <StatCard title="Stock Alerts" value={count} icon={AlertTriangle} variant="destructive" />
+    </Link>
+  );
 }
