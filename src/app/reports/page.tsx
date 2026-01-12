@@ -9,6 +9,12 @@ import ProductsByCategoryChart from '@/components/reports/products-by-category-c
 import PaymentMethodSummaryChart from '@/components/reports/payment-method-summary-chart';
 import UserSalesSummaryChart from '@/components/reports/user-sales-summary-chart';
 import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import * as XLSX from 'xlsx';
@@ -100,30 +106,43 @@ export default function ReportsPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleExport = () => {
+  const handleExport = (exportType: 'all' | 'topSelling' | 'byCategory' | 'paymentMethod' | 'userSales') => {
     if (exporting) return;
     setExporting(true);
-
+  
     try {
       const wb = XLSX.utils.book_new();
-
-      const topSellingWs = XLSX.utils.json_to_sheet(topSellingProducts);
-      XLSX.utils.book_append_sheet(wb, topSellingWs, 'Top Selling Products');
-
-      const productsByCategoryWs = XLSX.utils.json_to_sheet(productsByCategory);
-      XLSX.utils.book_append_sheet(wb, productsByCategoryWs, 'Products By Category');
-
-      const paymentMethodWs = XLSX.utils.json_to_sheet(paymentMethodSummary);
-      XLSX.utils.book_append_sheet(wb, paymentMethodWs, 'Payment Method Summary');
-
-      const userSalesWs = XLSX.utils.json_to_sheet(userSalesSummary);
-      XLSX.utils.book_append_sheet(wb, userSalesWs, 'User Sales Summary');
-
-      XLSX.writeFile(wb, 'StockSync_Reports.xlsx');
-
+  
+      if (exportType === 'all' || exportType === 'topSelling') {
+        const ws = XLSX.utils.json_to_sheet(topSellingProducts);
+        XLSX.utils.book_append_sheet(wb, ws, 'Top Selling Products');
+      }
+      if (exportType === 'all' || exportType === 'byCategory') {
+        const ws = XLSX.utils.json_to_sheet(productsByCategory);
+        XLSX.utils.book_append_sheet(wb, ws, 'Products By Category');
+      }
+      if (exportType === 'all' || exportType === 'paymentMethod') {
+        const ws = XLSX.utils.json_to_sheet(paymentMethodSummary);
+        XLSX.utils.book_append_sheet(wb, ws, 'Payment Method Summary');
+      }
+      if (exportType === 'all' || exportType === 'userSales') {
+        const ws = XLSX.utils.json_to_sheet(userSalesSummary);
+        XLSX.utils.book_append_sheet(wb, ws, 'User Sales Summary');
+      }
+  
+      const filename = {
+        all: 'StockSync_All_Reports.xlsx',
+        topSelling: 'StockSync_Top_Selling_Products.xlsx',
+        byCategory: 'StockSync_Products_By_Category.xlsx',
+        paymentMethod: 'StockSync_Payment_Method_Summary.xlsx',
+        userSales: 'StockSync_User_Sales_Summary.xlsx',
+      }[exportType];
+  
+      XLSX.writeFile(wb, filename);
+  
       toast({
         title: 'Export Successful',
-        description: 'Your reports have been exported to Excel.',
+        description: `Your report has been exported to ${filename}.`,
       });
     } catch (error) {
       toast({
@@ -146,14 +165,35 @@ export default function ReportsPage() {
           <main className="p-4 sm:p-6 lg:p-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
               <h1 className="text-2xl sm:text-3xl font-bold">Reports</h1>
-              <Button onClick={handleExport} disabled={loading || exporting || topSellingProducts.length === 0}>
-                {exporting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="mr-2 h-4 w-4" />
-                )}
-                Export All to Excel
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button disabled={loading || exporting || topSellingProducts.length === 0}>
+                    {exporting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="mr-2 h-4 w-4" />
+                    )}
+                    Export to Excel
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport('all')}>
+                    Export All Reports
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('topSelling')}>
+                    Export Top Selling Products
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('byCategory')}>
+                    Export Products By Category
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('paymentMethod')}>
+                    Export Payment Method Summary
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('userSales')}>
+                    Export User Sales Summary
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               <SalesByProductChart data={topSellingProducts} loading={loading} />
