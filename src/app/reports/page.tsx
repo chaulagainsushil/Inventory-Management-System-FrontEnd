@@ -6,6 +6,7 @@ import Header from '@/components/layout/header';
 import SalesByProductChart from '@/components/reports/sales-by-product-chart';
 import ProductsByCategoryChart from '@/components/reports/products-by-category-chart';
 import PaymentMethodSummaryChart from '@/components/reports/payment-method-summary-chart';
+import UserSalesSummaryChart from '@/components/reports/user-sales-summary-chart';
 
 export default function ReportsPage() {
   return (
@@ -19,6 +20,7 @@ export default function ReportsPage() {
                 <SalesByProductChart />
                 <ProductsByCategoryChart />
                 <PaymentMethodSummaryChart />
+                <UserSalesSummaryChart />
             </div>
           </main>
         </SidebarInset>
