@@ -10,16 +10,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { type TopSellingProduct } from '@/lib/types';
 
-type TopSellingProduct = {
-  productId: number;
-  productName: string;
-  totalQuantitySold: number;
-  salesPercentage: number;
-  totalSalesAmount: number;
-};
 
 const CHART_COLORS = [
   'hsl(var(--chart-1))',
@@ -34,89 +27,39 @@ const CHART_COLORS = [
   'hsl(250, 60%, 70%)',
 ];
 
+type Props = {
+  data: TopSellingProduct[];
+  loading: boolean;
+};
 
-export default function SalesByProductChart() {
+export default function SalesByProductChart({ data, loading }: Props) {
   const [chartData, setChartData] = React.useState<any[]>([]);
   const [chartConfig, setChartConfig] = React.useState<any>({});
-  const [loading, setLoading] = React.useState(true);
-  const { toast } = useToast();
-
-  const getAuthHeaders = React.useCallback(() => {
-    if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to view reports. Please log in again.',
-      });
-      return null;
-    }
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  }, [toast]);
 
   React.useEffect(() => {
-    const fetchTopSellingProducts = async (retries = 3) => {
-      const headers = getAuthHeaders();
-      if (!headers) {
-        if (retries > 0) {
-          setTimeout(() => fetchTopSellingProducts(retries - 1), 500);
-        } else {
-          setLoading(false);
-        }
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/Sales/top-selling-products?topCount=10`,
-          { headers }
-        );
+    if (data && data.length > 0) {
+      const newChartConfig: any = {
+        salesPercentage: { label: 'Sales %' },
+      };
+      
+      const newChartData = data.map((product, index) => {
+        const colorName = `product${index + 1}`;
+        newChartConfig[colorName] = {
+          label: product.productName,
+          color: CHART_COLORS[index % CHART_COLORS.length],
+        };
+        return {
+          ...product,
+          fill: `var(--color-${colorName})`,
+        };
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch top-selling products.');
-        }
-
-        const data: TopSellingProduct[] = await response.json();
-
-        if (data && data.length > 0) {
-          const newChartConfig: any = {
-            salesPercentage: { label: 'Sales %' },
-          };
-          
-          const newChartData = data.map((product, index) => {
-            const colorName = `product${index + 1}`;
-            newChartConfig[colorName] = {
-              label: product.productName,
-              color: CHART_COLORS[index % CHART_COLORS.length],
-            };
-            return {
-              ...product,
-              fill: `var(--color-${colorName})`,
-            };
-          });
-
-          setChartConfig(newChartConfig);
-          setChartData(newChartData);
-        } else {
-          setChartData([]);
-        }
-
-      } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: 'Error fetching report data',
-          description: error.message || 'An unknown error occurred.',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTopSellingProducts();
-  }, [getAuthHeaders, toast]);
+      setChartConfig(newChartConfig);
+      setChartData(newChartData);
+    } else {
+      setChartData([]);
+    }
+  }, [data]);
 
   return (
     <Card>
@@ -143,7 +86,7 @@ export default function SalesByProductChart() {
                             <div className='text-sm'>
                               <p>Total Sales: Rs. {payload.totalSalesAmount.toFixed(2)}</p>
                               <p>Quantity Sold: {payload.totalQuantitySold}</p>
-                              <p>Sales Percentage: {`${value.toFixed(2)}%`}</p>
+                              <p>Sales Percentage: {`${(value as number).toFixed(2)}%`}</p>
                             </div>
                         </div>
                     )
@@ -191,7 +134,7 @@ export default function SalesByProductChart() {
                   formatter={(value, entry) => {
                     return (
                       <span className="text-sm text-foreground">
-                        {value}
+                        {entry.payload.label}
                       </span>
                     );
                   }}

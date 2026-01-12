@@ -10,15 +10,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { type PaymentMethodData } from '@/lib/types';
 
-type PaymentMethodData = {
-  paymentMethod: string;
-  saleCount: number;
-  totalAmount: number;
-  percentage: number;
-};
 
 const CHART_COLORS = [
   'hsl(var(--chart-1))',
@@ -28,89 +22,38 @@ const CHART_COLORS = [
   'hsl(var(--chart-5))',
 ];
 
-export default function PaymentMethodSummaryChart() {
+type Props = {
+  data: PaymentMethodData[];
+  loading: boolean;
+};
+
+export default function PaymentMethodSummaryChart({ data, loading }: Props) {
   const [chartData, setChartData] = React.useState<any[]>([]);
   const [chartConfig, setChartConfig] = React.useState<any>({});
-  const [loading, setLoading] = React.useState(true);
-  const { toast } = useToast();
-
-  const getAuthHeaders = React.useCallback(() => {
-    if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to view reports.',
-      });
-      return null;
-    }
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  }, [toast]);
 
   React.useEffect(() => {
-    const fetchPaymentSummary = async (retries = 3) => {
-      const headers = getAuthHeaders();
-      if (!headers) {
-        if (retries > 0) {
-          setTimeout(() => fetchPaymentSummary(retries - 1), 500);
-        } else {
-          setLoading(false);
-        }
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/Sales/payment-method-summary`,
-          { headers }
-        );
+    if (data && data.length > 0) {
+      const newChartConfig: any = {
+        percentage: { label: '%' },
+      };
+      
+      const newChartData = data.map((item, index) => {
+        newChartConfig[item.paymentMethod] = {
+          label: item.paymentMethod,
+          color: CHART_COLORS[index % CHART_COLORS.length],
+        };
+        return {
+          ...item,
+          fill: `var(--color-${item.paymentMethod})`,
+        };
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch payment method summary.');
-        }
-
-        const apiResponse = await response.json();
-        const data: PaymentMethodData[] = apiResponse.data;
-
-        if (data && data.length > 0) {
-          const newChartConfig: any = {
-            percentage: { label: '%' },
-          };
-          
-          const newChartData = data.map((item, index) => {
-            const colorName = `payment${index + 1}`;
-            newChartConfig[item.paymentMethod] = {
-              label: item.paymentMethod,
-              color: CHART_COLORS[index % CHART_COLORS.length],
-            };
-            return {
-              ...item,
-              fill: `var(--color-${item.paymentMethod})`,
-            };
-          });
-
-          setChartConfig(newChartConfig);
-          setChartData(newChartData);
-        } else {
-          setChartData([]);
-        }
-
-      } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: 'Error fetching report data',
-          description: error.message || 'An unknown error occurred.',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPaymentSummary();
-  }, [getAuthHeaders, toast]);
+      setChartConfig(newChartConfig);
+      setChartData(newChartData);
+    } else {
+      setChartData([]);
+    }
+  }, [data]);
 
   return (
     <Card>
@@ -137,7 +80,7 @@ export default function PaymentMethodSummaryChart() {
                             <div className='text-sm'>
                               <p>Total Amount: Rs. {payload.totalAmount.toFixed(2)}</p>
                               <p>Sale Count: {payload.saleCount}</p>
-                              <p>Percentage: {`${value.toFixed(2)}%`}</p>
+                              <p>Percentage: {`${(value as number).toFixed(2)}%`}</p>
                             </div>
                         </div>
                     )

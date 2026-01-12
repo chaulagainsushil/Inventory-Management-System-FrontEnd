@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -11,15 +10,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-
-type CategoryProductInfo = {
-  categoryId: number;
-  categoryName: string;
-  productCount: number;
-  percentageOfTotal: number;
-};
+import { type CategoryProductInfo } from '@/lib/types';
 
 const CHART_COLORS = [
   'hsl(var(--chart-1))',
@@ -34,71 +26,12 @@ const CHART_COLORS = [
   'hsl(250, 60%, 70%)',
 ];
 
-export default function ProductsByCategoryChart() {
-  const [chartData, setChartData] = React.useState<CategoryProductInfo[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const { toast } = useToast();
+type Props = {
+    data: CategoryProductInfo[];
+    loading: boolean;
+};
 
-  const getAuthHeaders = React.useCallback(() => {
-    if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to view reports. Please log in again.',
-      });
-      return null;
-    }
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  }, [toast]);
-
-  React.useEffect(() => {
-    const fetchProductsByCategory = async (retries = 3) => {
-      const headers = getAuthHeaders();
-      if (!headers) {
-        if (retries > 0) {
-          setTimeout(() => fetchProductsByCategory(retries - 1), 500);
-        } else {
-          setLoading(false);
-        }
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/Product/products-by-category`,
-          { headers }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch product distribution data.');
-        }
-
-        const apiResponse = await response.json();
-        
-        if (apiResponse.isSuccess && apiResponse.data && apiResponse.data.categories) {
-          setChartData(apiResponse.data.categories);
-        } else {
-            setChartData([]);
-        }
-
-      } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: 'Error fetching report data',
-          description: error.message || 'An unknown error occurred.',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProductsByCategory();
-  }, [getAuthHeaders, toast]);
-
+export default function ProductsByCategoryChart({ data: chartData, loading }: Props) {
   const chartConfig = React.useMemo(() => {
     const config: any = {
         productCount: {
@@ -119,7 +52,6 @@ export default function ProductsByCategoryChart() {
     type: 'square',
     color: CHART_COLORS[index % CHART_COLORS.length],
   }));
-
 
   return (
     <Card>

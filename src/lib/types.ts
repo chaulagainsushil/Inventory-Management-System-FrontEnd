@@ -54,3 +54,33 @@ export type StockAlert = {
   suggestedOrderQty: number;
   urgencyLevel: string;
 }
+
+export type TopSellingProduct = {
+  productId: number;
+  productName: string;
+  totalQuantitySold: number;
+  salesPercentage: number;
+  totalSalesAmount: number;
+};
+
+export type CategoryProductInfo = {
+  categoryId: number;
+  categoryName: string;
+  productCount: number;
+  percentageOfTotal: number;
+};
+
+export type PaymentMethodData = {
+  paymentMethod: string;
+  saleCount: number;
+  totalAmount: number;
+  percentage: number;
+};
+
+export type UserSalesData = {
+  userId: string;
+  userName: string;
+  saleCount: number;
+  totalAmount: number;
+  percentage: number;
+};

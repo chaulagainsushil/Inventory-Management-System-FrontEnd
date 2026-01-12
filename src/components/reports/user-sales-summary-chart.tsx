@@ -10,16 +10,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { type UserSalesData } from '@/lib/types';
 
-type UserSalesData = {
-  userId: string;
-  userName: string;
-  saleCount: number;
-  totalAmount: number;
-  percentage: number;
-};
 
 const CHART_COLORS = [
   'hsl(var(--chart-1))',
@@ -29,88 +22,39 @@ const CHART_COLORS = [
   'hsl(var(--chart-5))',
 ];
 
-export default function UserSalesSummaryChart() {
+type Props = {
+  data: UserSalesData[];
+  loading: boolean;
+};
+
+export default function UserSalesSummaryChart({ data, loading }: Props) {
   const [chartData, setChartData] = React.useState<any[]>([]);
   const [chartConfig, setChartConfig] = React.useState<any>({});
-  const [loading, setLoading] = React.useState(true);
-  const { toast } = useToast();
-
-  const getAuthHeaders = React.useCallback(() => {
-    if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to view reports.',
-      });
-      return null;
-    }
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  }, [toast]);
 
   React.useEffect(() => {
-    const fetchUserSalesSummary = async (retries = 3) => {
-      const headers = getAuthHeaders();
-      if (!headers) {
-        if (retries > 0) {
-          setTimeout(() => fetchUserSalesSummary(retries - 1), 500);
-        } else {
-          setLoading(false);
-        }
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/Sales/user-sales-summary`,
-          { headers }
-        );
+    if (data && data.length > 0) {
+      const newChartConfig: any = {
+        percentage: { label: '%' },
+      };
+      
+      const newChartData = data.map((item, index) => {
+        const colorName = `user${index + 1}`;
+        newChartConfig[item.userName] = {
+          label: item.userName,
+          color: CHART_COLORS[index % CHART_COLORS.length],
+        };
+        return {
+          ...item,
+          fill: `var(--color-${item.userName.replace(/\s+/g, '-')})`, // create css-friendly names
+        };
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch user sales summary.');
-        }
-
-        const data: UserSalesData[] = await response.json();
-
-        if (data && data.length > 0) {
-          const newChartConfig: any = {
-            percentage: { label: '%' },
-          };
-          
-          const newChartData = data.map((item, index) => {
-            const colorName = `user${index + 1}`;
-            newChartConfig[item.userName] = {
-              label: item.userName,
-              color: CHART_COLORS[index % CHART_COLORS.length],
-            };
-            return {
-              ...item,
-              fill: `var(--color-${item.userName.replace(/\s+/g, '-')})`, // create css-friendly names
-            };
-          });
-
-          setChartConfig(newChartConfig);
-          setChartData(newChartData);
-        } else {
-          setChartData([]);
-        }
-
-      } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: 'Error fetching report data',
-          description: error.message || 'An unknown error occurred.',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserSalesSummary();
-  }, [getAuthHeaders, toast]);
+      setChartConfig(newChartConfig);
+      setChartData(newChartData);
+    } else {
+      setChartData([]);
+    }
+  }, [data]);
 
   return (
     <Card>
