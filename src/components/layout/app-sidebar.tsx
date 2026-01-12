@@ -20,9 +20,19 @@ import {
   UserPlus,
   Users,
   AlertTriangle,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -33,12 +43,12 @@ const navItems = [
   { href: '/stock-alerts', icon: AlertTriangle, label: 'Stock Alerts' },
   { href: '/reports', icon: BarChartIcon, label: 'Reports' },
   { href: '/users', icon: UserPlus, label: 'Create User' },
-  { href: '#', icon: Settings, label: 'Settings' },
 ];
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { setTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -89,6 +99,28 @@ export default function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton tooltip="Change theme">
+                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="group-data-[collapsible=icon]:hidden">Theme</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="end">
+                <DropdownMenuItem onClick={() => setTheme('light')}>
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('system')}>
+                  System
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
               <LogOut />
