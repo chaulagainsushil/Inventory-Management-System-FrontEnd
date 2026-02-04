@@ -39,7 +39,6 @@ const navItems = [
   { href: '/products', icon: Boxes, label: 'Products' },
   { href: '/categories', icon: LayoutGrid, label: 'Categories' },
   { href: '/suppliers', icon: Truck, label: 'Suppliers' },
-  { href: '/customers', icon: Users, label: 'Customers' },
   { href: '/stock-alerts', icon: AlertTriangle, label: 'Stock Alerts' },
   { href: '/reports', icon: BarChartIcon, label: 'Reports' },
   { href: '/users', icon: UserPlus, label: 'Create User' },
