@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
@@ -10,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Smartphone, ShieldCheck, Warehouse, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -70,120 +69,75 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-primary text-primary-foreground lg:flex flex-col items-center justify-center p-12 text-center">
-        <div className="max-w-md">
-          <h2 className="text-4xl font-bold font-headline mb-4">Automate Your Inventory</h2>
-          <p className="text-lg opacity-90 mb-8">
-            StockSync is a powerful, intuitive inventory management system designed to give you complete control over your stock, from procurement to sales.
+    <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+      <div className="mx-auto w-full max-w-sm space-y-6">
+        <div className="grid gap-2 text-center">
+          <h1 className="text-4xl font-bold font-headline text-primary">StockSync</h1>
+          <p className="text-balance text-muted-foreground">
+            Welcome back! Please log in to continue.
           </p>
-          <div className="space-y-6 text-left">
-            <div className="flex items-start gap-4">
-              <div className="bg-accent/20 p-2 rounded-full">
-                <Warehouse className="h-6 w-6 text-accent" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-xl">What is StockSync?</h3>
-                <p className="opacity-80">
-                  An all-in-one platform to track products, manage suppliers, handle purchase orders, and monitor stock levels in real-time.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="bg-accent/20 p-2 rounded-full">
-                <ShieldCheck className="h-6 w-6 text-accent" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-xl">Why is it reliable?</h3>
-                <p className="opacity-80">
-                  Built on a robust and secure architecture, StockSync ensures your data is always safe, accurate, and accessible when you need it.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="bg-accent/20 p-2 rounded-full">
-                <Smartphone className="h-6 w-6 text-accent" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-xl">Mobile App Available</h3>
-                <p className="opacity-80">
-                  Manage your inventory on the go. Our mobile app keeps you connected and in control, wherever you are.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      <div className="flex items-center justify-center py-12 px-4">
-        <div className="mx-auto w-full max-w-sm space-y-6">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-4xl font-bold font-headline text-primary">StockSync</h1>
-            <p className="text-balance text-muted-foreground">
-              Welcome back! Please log in to continue.
-            </p>
-          </div>
-          <Card className="shadow-lg">
-            <form onSubmit={handleSubmit}>
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold">Login</CardTitle>
-                <CardDescription>Enter your email below to login to your account</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+        <Card className="shadow-lg">
+          <form onSubmit={handleSubmit}>
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">Login</CardTitle>
+              <CardDescription>Enter your email below to login to your account</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Link href="#" className="ml-auto inline-block text-sm underline">
+                    Forgot your password?
+                  </Link>
+                </div>
+                <div className="relative">
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
+                    className="pr-10"
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </button>
                 </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="#" className="ml-auto inline-block text-sm underline">
-                      Forgot your password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 flex items-center pr-3"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={loading}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember-me" disabled={loading} />
-                  <Label htmlFor="remember-me" className="text-sm font-normal">Remember me</Label>
-                </div>
-                <Button type="submit" className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold hover:from-primary/90 hover:to-accent/90" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Login
-                </Button>
-              </CardContent>
-            </form>
-          </Card>
-        </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="remember-me" disabled={loading} />
+                <Label htmlFor="remember-me" className="text-sm font-normal">Remember me</Label>
+              </div>
+              <Button type="submit" className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold hover:from-primary/90 hover:to-accent/90" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Login
+              </Button>
+            </CardContent>
+          </form>
+        </Card>
       </div>
     </div>
   );
