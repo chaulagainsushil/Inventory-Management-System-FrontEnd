@@ -7,7 +7,6 @@ import StatCard from "@/components/dashboard/stat-card";
 import { Boxes, LayoutGrid, AlertTriangle, CreditCard, Users } from "lucide-react";
 import InventoryMovementChart from "@/components/dashboard/inventory-movement-chart";
 import StockReportChart from "@/components/dashboard/stock-report-chart";
-import SalesStatsChart from "@/components/dashboard/sales-stats-chart";
 import ProductList from "@/components/dashboard/product-list";
 import CategoryCountStat from "@/components/dashboard/category-count-stat";
 import ProductCountStat from "@/components/dashboard/product-count-stat";
@@ -44,7 +43,6 @@ export default function DashboardPage() {
               </div>
               <div className="space-y-6">
                 <StockReportChart />
-                <SalesStatsChart />
               </div>
             </div>
           </main>
