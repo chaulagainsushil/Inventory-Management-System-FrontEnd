@@ -21,13 +21,16 @@ import { useToast } from '@/hooks/use-toast';
 import { type StockAlert } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import AddStockForm from './add-stock-form';
 
 const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 
 export default function StockAlertList() {
   const [alerts, setAlerts] = useState<StockAlert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [updatingProductId, setUpdatingProductId] = useState<number | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState<StockAlert | null>(null);
   const { toast } = useToast();
 
   const getAuthHeaders = useCallback(() => {
@@ -84,32 +87,40 @@ export default function StockAlertList() {
     fetchAlerts();
   }, [fetchAlerts]);
 
-  const handleAddStock = async (alert: StockAlert) => {
-    setUpdatingProductId(alert.productId);
+  const handleOpenAddStockDialog = (alert: StockAlert) => {
+    setSelectedAlert(alert);
+    setIsFormOpen(true);
+  };
+
+  const handleAddStockSubmit = async ({ quantityToAdd }: { quantityToAdd: number }) => {
+    if (!selectedAlert) return;
+
+    setFormLoading(true);
     const headers = getAuthHeaders();
     if (!headers) {
-      setUpdatingProductId(null);
+      setFormLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(`${apiBaseUrl}/Product/${alert.productId}/add-quantity`, {
+      const response = await fetch(`${apiBaseUrl}/Product/${selectedAlert.productId}/add-quantity`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ quantityToAdd: alert.suggestedOrderQty }),
+        body: JSON.stringify({ quantityToAdd }),
       });
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(errorData || `Failed to add stock for ${alert.productName}`);
+        throw new Error(errorData || `Failed to add stock for ${selectedAlert.productName}`);
       }
 
       toast({
         title: 'Success',
-        description: `Successfully added ${alert.suggestedOrderQty} units to ${alert.productName}.`,
+        description: `Successfully added ${quantityToAdd} units to ${selectedAlert.productName}.`,
       });
-
-      fetchAlerts();
+      
+      setIsFormOpen(false);
+      fetchAlerts(); // Refresh the list
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -117,7 +128,7 @@ export default function StockAlertList() {
         description: error.message,
       });
     } finally {
-      setUpdatingProductId(null);
+      setFormLoading(false);
     }
   };
 
@@ -181,14 +192,9 @@ export default function StockAlertList() {
                         <TableCell className="text-right">
                           <Button
                             size="sm"
-                            onClick={() => handleAddStock(alert)}
-                            disabled={updatingProductId === alert.productId}
+                            onClick={() => handleOpenAddStockDialog(alert)}
                           >
-                            {updatingProductId === alert.productId ? (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                              <Plus className="mr-2 h-4 w-4" />
-                            )}
+                            <Plus className="mr-2 h-4 w-4" />
                             Add Stock
                           </Button>
                         </TableCell>
@@ -210,6 +216,14 @@ export default function StockAlertList() {
           )}
         </CardContent>
       </Card>
+      
+      <AddStockForm
+        isOpen={isFormOpen}
+        setIsOpen={setIsFormOpen}
+        onSubmit={handleAddStockSubmit}
+        alert={selectedAlert}
+        loading={formLoading}
+      />
     </>
   );
 }
