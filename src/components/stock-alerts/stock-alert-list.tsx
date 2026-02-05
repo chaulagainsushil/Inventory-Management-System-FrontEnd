@@ -16,17 +16,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type StockAlert } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
-const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/Sales/reorder-alerts`;
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 
 export default function StockAlertList() {
   const [alerts, setAlerts] = useState<StockAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingProductId, setUpdatingProductId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const getAuthHeaders = useCallback(() => {
@@ -59,7 +60,7 @@ export default function StockAlertList() {
 
     setLoading(true);
     try {
-      const response = await fetch(apiBaseUrl, { headers });
+      const response = await fetch(`${apiBaseUrl}/Sales/reorder-alerts`, { headers });
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('Your session has expired. Please log in again.');
@@ -82,6 +83,43 @@ export default function StockAlertList() {
   useEffect(() => {
     fetchAlerts();
   }, [fetchAlerts]);
+
+  const handleAddStock = async (alert: StockAlert) => {
+    setUpdatingProductId(alert.productId);
+    const headers = getAuthHeaders();
+    if (!headers) {
+      setUpdatingProductId(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/Product/${alert.productId}/add-quantity`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ quantityToAdd: alert.suggestedOrderQty }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || `Failed to add stock for ${alert.productName}`);
+      }
+
+      toast({
+        title: 'Success',
+        description: `Successfully added ${alert.suggestedOrderQty} units to ${alert.productName}.`,
+      });
+
+      fetchAlerts();
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Operation Failed',
+        description: error.message,
+      });
+    } finally {
+      setUpdatingProductId(null);
+    }
+  };
 
   const getUrgencyBadge = (level: string) => {
     switch (level.toUpperCase()) {
@@ -124,7 +162,8 @@ export default function StockAlertList() {
                     <TableHead className="hidden md:table-cell">Avg. Daily Sales</TableHead>
                     <TableHead>Lead Time</TableHead>
                     <TableHead>Suggested Qty</TableHead>
-                    <TableHead className="text-right">Urgency</TableHead>
+                    <TableHead>Urgency</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -138,12 +177,26 @@ export default function StockAlertList() {
                         <TableCell className="hidden md:table-cell">{alert.averageDailySales.toFixed(2)}</TableCell>
                         <TableCell>{alert.leadTimeDays} days</TableCell>
                         <TableCell className="text-green-600 font-bold">{alert.suggestedOrderQty}</TableCell>
-                        <TableCell className="text-right">{getUrgencyBadge(alert.urgencyLevel)}</TableCell>
+                        <TableCell>{getUrgencyBadge(alert.urgencyLevel)}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            onClick={() => handleAddStock(alert)}
+                            disabled={updatingProductId === alert.productId}
+                          >
+                            {updatingProductId === alert.productId ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Plus className="mr-2 h-4 w-4" />
+                            )}
+                            Add Stock
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center h-24">
+                      <TableCell colSpan={9} className="text-center h-24">
                         <div className="flex flex-col items-center justify-center gap-2">
                             <AlertTriangle className="h-8 w-8 text-green-500" />
                             <span className="text-muted-foreground">No stock alerts right now. Well done!</span>
