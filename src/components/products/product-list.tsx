@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,11 +24,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Loader2, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type Product, type Category } from '@/lib/types';
 import ProductForm from './product-form';
 import { z } from 'zod';
+import { Input } from '@/components/ui/input';
 
 const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 
@@ -53,6 +53,7 @@ export default function ProductList() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
   const getAuthHeaders = useCallback(() => {
@@ -188,6 +189,12 @@ export default function ProductList() {
     return <Badge className="bg-green-500">In Stock</Badge>;
   };
 
+  const filteredProducts = products.filter(product =>
+    product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (categories.get(product.categoryId) || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
@@ -199,8 +206,22 @@ export default function ProductList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Products</CardTitle>
-          <CardDescription>A list of all your products.</CardDescription>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle>Products</CardTitle>
+              <CardDescription>A list of all your products.</CardDescription>
+            </div>
+            <div className="relative w-full sm:w-auto">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by name, category, SKU..."
+                className="pl-8 sm:w-[300px] w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -225,8 +246,8 @@ export default function ProductList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.length > 0 ? (
-                    products.map((product) => (
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => (
                       <TableRow key={product.id}>
                         <TableCell className="hidden sm:table-cell">{product.id}</TableCell>
                         <TableCell className="font-medium">{product.productName}</TableCell>
