@@ -241,7 +241,6 @@ export default function ProductList() {
                     <TableHead className="hidden md:table-cell">Buy Price</TableHead>
                     <TableHead className="hidden lg:table-cell">SKU</TableHead>
                     <TableHead>Stock</TableHead>
-                    <TableHead>Lead Time</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -257,7 +256,6 @@ export default function ProductList() {
                         <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
                         <TableCell className="hidden lg:table-cell">{product.sku}</TableCell>
                         <TableCell>{product.stockQuantity}</TableCell>
-                        <TableCell>{product.leadTimeDays ? `${product.leadTimeDays} days` : 'N/A'}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -280,7 +278,7 @@ export default function ProductList() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={11} className="text-center h-24">
+                      <TableCell colSpan={9} className="text-center h-24">
                         No products found.
                       </TableCell>
                     </TableRow>
