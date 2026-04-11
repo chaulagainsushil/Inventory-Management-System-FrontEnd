@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -43,11 +42,16 @@ const formSchema = z.object({
   stockQuantity: z.coerce.number().int().min(0, 'Stock quantity must be a whole number.'),
   sku: z.string().min(1, 'SKU is required.'),
   categoryId: z.coerce.number().int().min(1, 'Category is required.'),
-  supplierId: z.coerce.number().int().min(1, 'Supplier ID is required.'),
+  supplierId: z.coerce.number().int().min(1, 'Supplier is required.'),
   leadTimeDays: z.coerce.number().int().min(0, 'Lead time must be a positive number.').optional(),
 });
 
 type CategoryDropdownItem = {
+  id: number;
+  name: string;
+};
+
+type SupplierDropdownItem = {
   id: number;
   name: string;
 };
@@ -68,6 +72,7 @@ export default function ProductForm({
   loading,
 }: ProductFormProps) {
   const [categories, setCategories] = React.useState<CategoryDropdownItem[]>([]);
+  const [suppliers, setSuppliers] = React.useState<SupplierDropdownItem[]>([]);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -86,7 +91,7 @@ export default function ProductForm({
   });
 
   React.useEffect(() => {
-    async function fetchCategories() {
+    async function fetchDropdownData() {
       const token = localStorage.getItem('authToken');
       if (!token) {
         toast({ variant: 'destructive', title: 'Authentication Error', description: 'Your session has expired. Please log in again.' });
@@ -94,19 +99,30 @@ export default function ProductForm({
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Category/Categorydropdown`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) throw new Error('Failed to fetch categories. The server might be unavailable.');
-        const data = await response.json();
-        setCategories(data);
+        const [categoriesResponse, suppliersResponse] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/Category/Categorydropdown`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/SupplierInformation/Supplierdropdown`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        
+        if (!categoriesResponse.ok) throw new Error('Failed to fetch categories. The server might be unavailable.');
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData);
+
+        if (!suppliersResponse.ok) throw new Error('Failed to fetch suppliers. The server might be unavailable.');
+        const suppliersData = await suppliersResponse.json();
+        setSuppliers(suppliersData);
+
       } catch (error: any) {
-        toast({ variant: 'destructive', title: 'Error', description: error.message || 'Could not load categories.' });
+        toast({ variant: 'destructive', title: 'Error', description: error.message || 'Could not load dropdown data.' });
       }
     }
 
     if (isOpen) {
-      fetchCategories();
+      fetchDropdownData();
       form.reset({
         productName: product?.productName || '',
         description: product?.description || '',
@@ -242,10 +258,25 @@ export default function ProductForm({
               name="supplierId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Supplier ID</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 1" {...field} />
-                  </FormControl>
+                  <FormLabel>Supplier</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                    defaultValue={field.value > 0 ? String(field.value) : undefined}
+                    value={field.value > 0 ? String(field.value) : undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a supplier" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {suppliers.map((supplier) => (
+                        <SelectItem key={supplier.id} value={String(supplier.id)}>
+                          {supplier.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
