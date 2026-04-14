@@ -53,7 +53,7 @@ type CategoryDropdownItem = {
 
 type SupplierDropdownItem = {
   id: number;
-  name: string;
+  supplierName: string;
 };
 
 type ProductFormProps = {
@@ -272,7 +272,7 @@ export default function ProductForm({
                     <SelectContent>
                       {suppliers.map((supplier) => (
                         <SelectItem key={supplier.id} value={String(supplier.id)}>
-                          {supplier.name}
+                          {supplier.supplierName}
                         </SelectItem>
                       ))}
                     </SelectContent>
