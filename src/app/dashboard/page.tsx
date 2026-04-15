@@ -3,10 +3,8 @@ import type { Metadata } from "next";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/layout/app-sidebar";
 import Header from "@/components/layout/header";
-import StatCard from "@/components/dashboard/stat-card";
 import { Boxes, LayoutGrid, AlertTriangle, CreditCard, Users } from "lucide-react";
 import InventoryMovementChart from "@/components/dashboard/inventory-movement-chart";
-import StockReportChart from "@/components/dashboard/stock-report-chart";
 import ProductList from "@/components/dashboard/product-list";
 import CategoryCountStat from "@/components/dashboard/category-count-stat";
 import ProductCountStat from "@/components/dashboard/product-count-stat";
@@ -37,14 +35,7 @@ export default function DashboardPage() {
 
             <InventoryMovementChart />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <ProductList />
-              </div>
-              <div className="space-y-6">
-                <StockReportChart />
-              </div>
-            </div>
+            <ProductList />
           </main>
         </SidebarInset>
       </div>
