@@ -151,7 +151,7 @@ export default function ProductList() {
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/Product/${selectedProduct.id}` : `${apiBaseUrl}/Product`;
 
-    const body = JSON.stringify(isEditing ? { ...values, id: selectedProduct.id } : values);
+    const body = JSON.stringify(values);
 
     try {
       const response = await fetch(url, {
