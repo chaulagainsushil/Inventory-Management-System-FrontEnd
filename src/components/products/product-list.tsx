@@ -23,13 +23,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle, MoreHorizontal, Loader2, Search } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type Product, type Category } from '@/lib/types';
 import ProductForm from './product-form';
 import { z } from 'zod';
-import { Input } from '@/components/ui/input';
 
 const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 
@@ -53,7 +59,7 @@ export default function ProductList() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
   const { toast } = useToast();
 
   const getAuthHeaders = useCallback(() => {
@@ -189,11 +195,10 @@ export default function ProductList() {
     return <Badge className="bg-green-500">In Stock</Badge>;
   };
 
-  const filteredProducts = products.filter(product =>
-    product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (categories.get(product.categoryId) || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(product => {
+    if (selectedCategoryId === 'all') return true;
+    return product.categoryId === parseInt(selectedCategoryId, 10);
+  });
 
   return (
     <>
@@ -212,14 +217,19 @@ export default function ProductList() {
               <CardDescription>A list of all your products.</CardDescription>
             </div>
             <div className="relative w-full sm:w-auto">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search by name, category, SKU..."
-                className="pl-8 sm:w-[300px] w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+              <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+                <SelectTrigger className="sm:w-[300px] w-full">
+                  <SelectValue placeholder="Filter by category..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {Array.from(categories.entries()).map(([id, name]) => (
+                    <SelectItem key={id} value={String(id)}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
