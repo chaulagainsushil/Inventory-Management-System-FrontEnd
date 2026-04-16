@@ -24,6 +24,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -54,10 +64,12 @@ const productFormSchema = z.object({
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Map<number, string>>(new Map());
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [categoryMap, setCategoryMap] = useState<Map<number, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
   const { toast } = useToast();
@@ -79,61 +91,55 @@ export default function ProductList() {
     };
   }, [toast]);
 
-  const fetchData = useCallback(
-    async (retries = 3) => {
-      const headers = getAuthHeaders();
-      if (!headers) {
-        if (retries > 0) {
-          setTimeout(() => fetchData(retries - 1), 500);
-        } else {
-          setLoading(false);
-        }
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const [productsResponse, categoriesResponse] = await Promise.all([
-          fetch(`${apiBaseUrl}/Product`, { headers }),
-          fetch(`${apiBaseUrl}/Category`, { headers }),
-        ]);
-
-        if (!productsResponse.ok) {
-          throw new Error('Failed to fetch products. The server might be down or experiencing issues.');
-        }
-        if (!categoriesResponse.ok) {
-          throw new Error('Failed to fetch categories. The server might be unavailable.');
-        }
-
-        const productsData = await productsResponse.json();
-        const categoriesData: Category[] = await categoriesResponse.json();
-        
-        const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat.name]));
-
-        const mappedProducts = productsData.map((p: any) => ({
-          ...p,
-          supplierId: p.suppliersInfromationId || p.supplierId,
-        }));
-
-        setProducts(mappedProducts);
-        setCategories(categoryMap);
-
-      } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: 'Error Fetching Data',
-          description: error.message || 'An unknown error occurred.',
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [toast, getAuthHeaders]
-  );
+  const fetchCategories = useCallback(async () => {
+    const headers = getAuthHeaders();
+    if (!headers) return;
+    try {
+      const categoriesResponse = await fetch(`${apiBaseUrl}/Category`, { headers });
+      if (!categoriesResponse.ok) throw new Error('Failed to fetch categories.');
+      const categoriesData: Category[] = await categoriesResponse.json();
+      setAllCategories(categoriesData);
+      setCategoryMap(new Map(categoriesData.map(cat => [cat.id, cat.name])));
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Error Fetching Categories', description: error.message });
+    }
+  }, [getAuthHeaders, toast]);
+  
+  const fetchProducts = useCallback(async () => {
+    const headers = getAuthHeaders();
+    if (!headers) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+  
+    let url = `${apiBaseUrl}/Product`;
+    if (selectedCategoryId !== 'all') {
+      url = `${apiBaseUrl}/Product/by-category/${selectedCategoryId}`;
+    }
+  
+    try {
+      const response = await fetch(url, { headers });
+      if (!response.ok) throw new Error('Failed to fetch products.');
+      const data = await response.json();
+      const productsData = Array.isArray(data) ? data : data.products || [];
+      
+      setProducts(productsData.map((p: any) => ({ ...p, supplierId: p.suppliersInfromationId || p.supplierId })));
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Error Fetching Products', description: error.message });
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [getAuthHeaders, toast, selectedCategoryId]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleAddClick = () => {
     setSelectedProduct(null);
@@ -143,6 +149,11 @@ export default function ProductList() {
   const handleEditClick = (product: Product) => {
     setSelectedProduct(product);
     setIsFormOpen(true);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDeleteAlertOpen(true);
   };
 
   const handleFormSubmit = async (values: z.infer<typeof productFormSchema>) => {
@@ -157,7 +168,7 @@ export default function ProductList() {
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${apiBaseUrl}/Product/${selectedProduct.id}` : `${apiBaseUrl}/Product`;
 
-    const body = JSON.stringify(values);
+    const body = JSON.stringify(isEditing ? { id: selectedProduct.id, ...values } : values);
 
     try {
       const response = await fetch(url, {
@@ -177,7 +188,7 @@ export default function ProductList() {
       });
 
       setIsFormOpen(false);
-      fetchData(); // Refresh list
+      fetchProducts(); // Refresh list
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -189,16 +200,50 @@ export default function ProductList() {
     }
   };
 
+  const handleDeleteConfirm = async () => {
+    if (!selectedProduct) return;
+    setFormLoading(true);
+
+    const headers = getAuthHeaders();
+    if (!headers) {
+        setFormLoading(false);
+        return;
+    }
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/Product/${selectedProduct.id}`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Failed to delete product');
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Product successfully deleted.',
+      });
+
+      setIsDeleteAlertOpen(false);
+      fetchProducts(); // Refresh list
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Deletion Failed',
+        description: error.message || 'An unknown error occurred.',
+      });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+
   const getStatus = (stock: number) => {
     if (stock === 0) return <Badge variant="destructive">Out of Stock</Badge>;
     if (stock > 0 && stock <= 10) return <Badge variant="secondary" className="bg-yellow-500 text-black">Low Stock</Badge>;
     return <Badge className="bg-green-500">In Stock</Badge>;
   };
-
-  const filteredProducts = products.filter(product => {
-    if (selectedCategoryId === 'all') return true;
-    return product.categoryId === parseInt(selectedCategoryId, 10);
-  });
 
   return (
     <>
@@ -223,9 +268,9 @@ export default function ProductList() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {Array.from(categories.entries()).map(([id, name]) => (
-                    <SelectItem key={id} value={String(id)}>
-                      {name}
+                  {allCategories.map((category) => (
+                    <SelectItem key={category.id} value={String(category.id)}>
+                      {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -255,12 +300,12 @@ export default function ProductList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.length > 0 ? (
-                    filteredProducts.map((product) => (
+                  {products.length > 0 ? (
+                    products.map((product) => (
                       <TableRow key={product.id}>
                         <TableCell className="hidden sm:table-cell">{product.id}</TableCell>
                         <TableCell className="font-medium">{product.productName}</TableCell>
-                        <TableCell>{categories.get(product.categoryId) || 'N/A'}</TableCell>
+                        <TableCell>{(product as any).categoryName || categoryMap.get(product.categoryId) || 'N/A'}</TableCell>
                         <TableCell className="hidden xl:table-cell max-w-[250px] truncate">{product.description}</TableCell>
                         <TableCell>Rs. {product.pricePerUnit.toFixed(2)}</TableCell>
                         <TableCell className="hidden md:table-cell">Rs. {product.pricePerUnitPurchased.toFixed(2)}</TableCell>
@@ -278,7 +323,7 @@ export default function ProductList() {
                               <DropdownMenuItem onClick={() => handleEditClick(product)}>
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">
+                              <DropdownMenuItem onClick={() => handleDeleteClick(product)} className="text-destructive">
                                 Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -307,6 +352,25 @@ export default function ProductList() {
         product={selectedProduct}
         loading={formLoading}
       />
+
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the product
+              &quot;{selectedProduct?.productName}&quot;.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={formLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90" disabled={formLoading}>
+              {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
