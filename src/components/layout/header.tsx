@@ -1,7 +1,7 @@
 "use client";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
-import { type User, type StockAlert } from "@/lib/types";
+import { type StockAlert } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,9 +14,10 @@ import {
 import { Bell, UserCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{ name: string } | null>(null);
   const [alerts, setAlerts] = useState<StockAlert[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
@@ -76,11 +77,14 @@ export default function Header() {
     window.location.href = '/';
   };
 
+  const userName = user?.name || 'User';
+  const userFirstName = userName.split(' ')[0];
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 sm:px-6">
       <SidebarTrigger className="md:hidden" />
       <div className="flex-1">
-        <h1 className="text-lg md:text-2xl font-semibold">Welcome Back, {user?.name || 'User'}</h1>
+        <h1 className="text-lg md:text-2xl font-semibold">Welcome Back, {userFirstName}</h1>
       </div>
       <div className="flex items-center gap-4">
         <DropdownMenu onOpenChange={(open) => { if (!open) handleMarkAsRead() }}>
@@ -134,7 +138,15 @@ export default function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
-              <UserCircle className="h-6 w-6" />
+               {user ? (
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>
+                    {userName.split(' ')[0].charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <UserCircle className="h-6 w-6" />
+              )}
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
